@@ -320,4 +320,9 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
   .card-actions { width: 100%; }
   .card-actions .btn { flex: 1; justify-content: center; }
   .toc-no { min-width: 2.6rem; }
+  /* Text-sized controls come out 29–33px tall, under the 44px a thumb needs —
+     and the pager wraps to two rows on a phone, so a miss lands on the wrong
+     page. The chapter rows are already full-width targets and need nothing. */
+  .chip { min-height: 2.75rem; display: inline-flex; align-items: center; padding: .15rem .75rem; }
+  .btn { min-height: 2.75rem; }
 }

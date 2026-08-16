@@ -38,11 +38,14 @@
         <div class="card-resume">อ่านค้างไว้ตอนที่ <%= n.resume.position %></div>
       <% } %>
     </div>
+    <%# Reading opens in its own tab, so the shelf stays where it was — browsing
+        and reading are separate activities here. rel=noopener because target
+        _blank otherwise hands the new page a handle on this one. %>
     <div class="card-actions">
       <% if (n.resume) { %>
-        <a class="btn btn-primary" href="/read/<%= enc(n.name) %>">อ่านต่อ →</a>
+        <a class="btn btn-primary" href="/read/<%= enc(n.name) %>" target="_blank" rel="noopener">อ่านต่อ →</a>
       <% } else if (n.firstRef) { %>
-        <a class="btn btn-primary" href="/read/<%= enc(n.name) %>/<%= enc(n.firstRef) %>">เริ่มอ่าน →</a>
+        <a class="btn btn-primary" href="/read/<%= enc(n.name) %>/<%= enc(n.firstRef) %>" target="_blank" rel="noopener">เริ่มอ่าน →</a>
       <% } %>
       <a class="btn" href="/novel/<%= enc(n.name) %>">สารบัญ</a>
     </div>

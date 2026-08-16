@@ -45,14 +45,16 @@
     <% } %>
   </div>
   <% if (savedRef) { %>
-    <a class="btn btn-primary" href="/read/<%= enc(novel) %>">อ่านต่อ →</a>
+    <a class="btn btn-primary" href="/read/<%= enc(novel) %>" target="_blank" rel="noopener">อ่านต่อ →</a>
   <% } %>
 </div>
 
+<%# Each chapter opens in its own tab, so this list — and any search that led to
+    it — is still here when the tab is closed. %>
 <ol class="toc">
 <% for (const c of chapters) { %>
   <li class="toc-row<%= c.ref === savedRef ? ' current' : '' %>">
-    <a href="/read/<%= enc(novel) %>/<%= enc(c.ref) %>">
+    <a href="/read/<%= enc(novel) %>/<%= enc(c.ref) %>" target="_blank" rel="noopener">
       <span class="toc-no"><%= c.no %></span>
       <span class="toc-title"><%= c.title || c.ref %></span>
       <% if (c.ref === savedRef) { %><span class="tag tag-here">อ่านค้าง</span><% } %>
