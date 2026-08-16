@@ -63,6 +63,28 @@ app.get('/', async (req, res, next) => {
         if (idx >= 0) n.resume = { ref, position: idx + 1, at: saved.at };
       }
     }
+
+    // Most recently read first — the shelf is a list of things in progress, and
+    // the one opened last is the one being read now.
+    //
+    // Three tiers, because a bookmark may have no timestamp: the reader.json
+    // that came with data/ carries entries with at: "", and sorting those as
+    // epoch 0 would bury books that are actually being read below untouched
+    // ones. So: timestamped (newest first), then bookmarked-but-undated, then
+    // never opened — each tier by title.
+    // Date.parse, not a string compare: the file mixes this app's "…847Z" with
+    // the Python side's "…678138+00:00", and those only sort alike while the
+    // offset happens to be +00:00.
+    const readAt = (n) => (n.resume?.at ? Date.parse(n.resume.at) || 0 : 0);
+    const tier = (n) => (readAt(n) ? 0 : n.resume ? 1 : 2);
+    novels.sort((a, b) => {
+      const ta = tier(a);
+      const tb = tier(b);
+      if (ta !== tb) return ta - tb;
+      if (ta === 0) return readAt(b) - readAt(a);
+      return a.name.localeCompare(b.name, 'th');
+    });
+
     res.render('novels', {
       page: 'novels',
       title: q ? `ค้นหา “${q}”` : 'ชั้นหนังสือ',
