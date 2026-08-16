@@ -41,7 +41,16 @@ app.locals.enc = enc;
 
 app.get('/', async (req, res, next) => {
   try {
-    const novels = await listNovels();
+    const all = await listNovels();
+    const q = typeof req.query.q === 'string' ? req.query.q.trim().slice(0, 100) : '';
+    // Title and genre, because both are on the card: someone who sees "cultivation"
+    // there and types it expects that to be a way to narrow the shelf.
+    const needle = q.toLowerCase();
+    const novels = needle
+      ? all.filter((n) => n.name.toLowerCase().includes(needle) ||
+                          (n.profile.genres || []).some((g) => String(g).toLowerCase().includes(needle)))
+      : all;
+
     // A bookmark may point at a novel that is no longer in data/, or at a
     // chapter that has since been deleted — resolve it against the real refs.
     for (const n of novels) {
@@ -54,7 +63,13 @@ app.get('/', async (req, res, next) => {
         if (idx >= 0) n.resume = { ref, position: idx + 1, at: saved.at };
       }
     }
-    res.render('novels', { page: 'novels', title: 'ชั้นหนังสือ', novels });
+    res.render('novels', {
+      page: 'novels',
+      title: q ? `ค้นหา “${q}”` : 'ชั้นหนังสือ',
+      novels,
+      q,
+      total: all.length,
+    });
   } catch (err) {
     next(err);
   }

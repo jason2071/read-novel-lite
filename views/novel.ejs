@@ -19,7 +19,7 @@
   <section class="empty"><p>เรื่องนี้ยังไม่มีตอนที่แปลเสร็จ</p></section>
 <% } else { %>
 
-<form class="toc-search" method="get" action="/novel/<%= enc(novel) %>" role="search">
+<form class="searchbar" method="get" action="/novel/<%= enc(novel) %>" role="search">
   <input type="search" name="q" value="<%= q %>" placeholder="ค้นหาชื่อตอน หรือเลขตอน"
          aria-label="ค้นหาชื่อตอน" autocomplete="off">
   <input type="hidden" name="size" value="<%= size %>">

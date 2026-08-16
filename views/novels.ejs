@@ -1,8 +1,23 @@
 <%- include('_head') %>
 
-<h1 class="page-title">ชั้นหนังสือ <span class="muted"><%= novels.length %> เรื่อง</span></h1>
+<h1 class="page-title">ชั้นหนังสือ <span class="muted"><%= total %> เรื่อง</span></h1>
 
-<% if (!novels.length) { %>
+<form class="searchbar" method="get" action="/" role="search">
+  <input type="search" name="q" value="<%= q %>" placeholder="ค้นหาชื่อเรื่อง หรือแนว"
+         aria-label="ค้นหานิยาย" autocomplete="off">
+  <button class="btn" type="submit">ค้นหา</button>
+  <% if (q) { %><a class="btn" href="/">ล้าง</a><% } %>
+</form>
+
+<% if (q) { %>
+  <p class="search-note">
+    <% if (novels.length) { %>
+      พบ <strong><%= novels.length %></strong> เรื่อง จากคำว่า “<%= q %>”
+    <% } else { %>
+      ไม่พบนิยายที่ตรงกับ “<%= q %>”
+    <% } %>
+  </p>
+<% } else if (!total) { %>
   <section class="empty">
     <p>ยังไม่มีนิยายในโฟลเดอร์ <code>data/</code></p>
   </section>
