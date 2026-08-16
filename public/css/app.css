@@ -150,6 +150,24 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
 
 /* -------------------------------------------------------- table of contents */
 
+.toc-search {
+  display: flex;
+  gap: .5rem;
+  margin: 1.2rem 0 0;
+}
+.toc-search input[type="search"] {
+  flex: 1;
+  min-width: 0;
+  padding: .45rem .7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: inherit;
+  font: inherit;
+}
+.toc-search input[type="search"]:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.search-note { margin: .7rem 0 0; font-size: .9rem; color: var(--text-muted); }
+
 .toc-tools {
   display: flex;
   align-items: center;

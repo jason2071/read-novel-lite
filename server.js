@@ -15,6 +15,7 @@ import {
   novelProfile,
   resolveWithin,
   safeName,
+  searchChapters,
 } from './lib/store.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -70,12 +71,25 @@ app.get('/novel/:novel', async (req, res, next) => {
     if (!profile) return res.status(404).render('error', errCtx(404, 'ไม่พบนิยายเรื่องนี้'));
 
     const refs = await chapterRefs(novel);
+    const q = typeof req.query.q === 'string' ? req.query.q.trim().slice(0, 100) : '';
+
+    // A search result set is paged exactly like the full list, so the two share
+    // everything below — only where the rows come from differs.
+    const rows = q
+      ? await searchChapters(novel, q)
+      : refs.map((ref, i) => ({ ref, no: i + 1, title: null }));
+
     const size = PAGE_SIZES.includes(Number(req.query.size)) ? Number(req.query.size) : DEFAULT_SIZE;
-    const pages = Math.max(1, Math.ceil(refs.length / size));
+    const pages = Math.max(1, Math.ceil(rows.length / size));
     const page = Math.min(pages, Math.max(1, Number(req.query.page) || 1));
     const start = (page - 1) * size;
-    const slice = refs.slice(start, start + size);
-    const titles = await chapterTitles(novel, slice);
+    const slice = rows.slice(start, start + size);
+    // searchChapters already carries the titles; the plain list still reads only
+    // the page it shows
+    if (!q) {
+      const titles = await chapterTitles(novel, slice.map((r) => r.ref));
+      slice.forEach((row, i) => { row.title = titles[i]; });
+    }
 
     const saved = prefs.progressFor(novel);
     const savedRef = saved
@@ -84,11 +98,13 @@ app.get('/novel/:novel', async (req, res, next) => {
 
     res.render('novel', {
       page: 'novel',
-      title: novel,
+      title: q ? `ค้นหา “${q}” · ${novel}` : novel,
       novel,
       profile,
       total: refs.length,
-      chapters: slice.map((ref, i) => ({ ref, no: start + i + 1, title: titles[i] })),
+      q,
+      found: q ? rows.length : null,
+      chapters: slice,
       pageNo: page,
       pages,
       size,

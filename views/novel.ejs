@@ -9,13 +9,33 @@
 </div>
 
 <%
-  // one place builds a link to this same list, so page/size never drift apart
-  const pageHref = (p, s) => `/novel/${enc(novel)}?page=${p}&size=${s || size}`;
+  // one place builds a link to this same list, so page/size and the search term
+  // never drift apart
+  const pageHref = (p, s) =>
+    `/novel/${enc(novel)}?page=${p}&size=${s || size}` + (q ? `&q=${enc(q)}` : '');
 %>
 
 <% if (!total) { %>
   <section class="empty"><p>เรื่องนี้ยังไม่มีตอนที่แปลเสร็จ</p></section>
 <% } else { %>
+
+<form class="toc-search" method="get" action="/novel/<%= enc(novel) %>" role="search">
+  <input type="search" name="q" value="<%= q %>" placeholder="ค้นหาชื่อตอน หรือเลขตอน"
+         aria-label="ค้นหาชื่อตอน" autocomplete="off">
+  <input type="hidden" name="size" value="<%= size %>">
+  <button class="btn" type="submit">ค้นหา</button>
+  <% if (q) { %><a class="btn" href="/novel/<%= enc(novel) %>?size=<%= size %>">ล้าง</a><% } %>
+</form>
+
+<% if (q) { %>
+  <p class="search-note">
+    <% if (found) { %>
+      พบ <strong><%= found.toLocaleString('th-TH') %></strong> ตอน จากคำว่า “<%= q %>”
+    <% } else { %>
+      ไม่พบตอนที่ชื่อมีคำว่า “<%= q %>”
+    <% } %>
+  </p>
+<% } %>
 
 <div class="toc-tools">
   <div class="sizes">
