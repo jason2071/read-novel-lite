@@ -43,14 +43,12 @@
       <span class="btn btn-sm disabled">← ตอนก่อน</span>
     <% } %>
 
-    <%# The chapter number and where it sits in the novel — no title of the site
-        or of the book, which the reader knows and does not need over every page. %>
+    <%# The book title doubles as the way back to its chapter list — the app
+        header is gone from this page, so this is where "where am I" lives. %>
     <div class="reader-where">
+      <a class="reader-novel" href="/novel/<%= enc(novel) %>" title="สารบัญ"><%= novel %></a>
       <span class="reader-chapter"><%= chapter %><% if (position) { %> · <%= position %><% } %></span>
     </div>
-
-    <%# with the crumb gone, this is the way back to the chapter list %>
-    <a class="btn btn-sm" href="/novel/<%= enc(novel) %>" title="สารบัญ">☰</a>
 
     <button type="button" class="btn btn-sm" id="btn-reader-settings"
             title="โหมดการอ่าน ขนาดตัวอักษร ระยะห่าง">⚙ การอ่าน</button>

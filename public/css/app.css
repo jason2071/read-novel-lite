@@ -225,6 +225,16 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
 }
 .reader-bar-foot { margin: 2rem 0 0; justify-content: space-between; }
 .reader-where { flex: 1; min-width: 0; text-align: center; }
+.reader-novel {
+  display: block;
+  font-size: .85rem;
+  font-weight: 600;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.reader-novel:hover { text-decoration: underline; }
 .reader-chapter { font-family: ui-monospace, Consolas, monospace; font-size: .8rem; color: var(--text-muted); }
 
 /* Full-bleed: the tint has to reach the viewport edges, or the app's grey frames
