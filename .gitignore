@@ -1,0 +1,14 @@
+node_modules/
+
+# The novels themselves: translated third-party fiction, hundreds of thousands of
+# files, and reader.json holds personal reading positions. The app reads whatever
+# is in data/ at runtime — see README.md for the layout it expects.
+data/
+
+npm-debug.log*
+*.log
+.env
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

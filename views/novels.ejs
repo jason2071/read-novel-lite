@@ -1,0 +1,38 @@
+<%- include('_head') %>
+
+<h1 class="page-title">ชั้นหนังสือ <span class="muted"><%= novels.length %> เรื่อง</span></h1>
+
+<% if (!novels.length) { %>
+  <section class="empty">
+    <p>ยังไม่มีนิยายในโฟลเดอร์ <code>data/</code></p>
+  </section>
+<% } %>
+
+<ul class="shelf">
+<% for (const n of novels) { %>
+  <li class="card">
+    <div class="card-main">
+      <a class="card-title" href="/novel/<%= enc(n.name) %>"><%= n.name %></a>
+      <div class="card-meta">
+        <span><%= n.count.toLocaleString('th-TH') %> ตอน</span>
+        <% if (n.profile.status === 'completed') { %><span class="tag tag-done">จบแล้ว</span><% } %>
+        <% if (n.profile.status === 'ongoing') { %><span class="tag">ยังไม่จบ</span><% } %>
+        <% for (const g of (n.profile.genres || [])) { %><span class="tag"><%= g %></span><% } %>
+      </div>
+      <% if (n.resume) { %>
+        <div class="card-resume">อ่านค้างไว้ตอนที่ <%= n.resume.position %></div>
+      <% } %>
+    </div>
+    <div class="card-actions">
+      <% if (n.resume) { %>
+        <a class="btn btn-primary" href="/read/<%= enc(n.name) %>">อ่านต่อ →</a>
+      <% } else if (n.firstRef) { %>
+        <a class="btn btn-primary" href="/read/<%= enc(n.name) %>/<%= enc(n.firstRef) %>">เริ่มอ่าน →</a>
+      <% } %>
+      <a class="btn" href="/novel/<%= enc(n.name) %>">สารบัญ</a>
+    </div>
+  </li>
+<% } %>
+</ul>
+
+<%- include('_foot') %>

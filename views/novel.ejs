@@ -1,0 +1,70 @@
+<%- include('_head') %>
+
+<h1 class="page-title"><%= novel %></h1>
+<div class="card-meta">
+  <span><%= total.toLocaleString('th-TH') %> ตอน</span>
+  <% if (profile.status === 'completed') { %><span class="tag tag-done">จบแล้ว</span><% } %>
+  <% for (const g of (profile.genres || [])) { %><span class="tag"><%= g %></span><% } %>
+  <% if (profile.source_url) { %><a class="muted small" href="<%= profile.source_url %>" rel="noreferrer noopener" target="_blank">ต้นฉบับ ↗</a><% } %>
+</div>
+
+<%
+  // one place builds a link to this same list, so page/size never drift apart
+  const pageHref = (p, s) => `/novel/${enc(novel)}?page=${p}&size=${s || size}`;
+%>
+
+<% if (!total) { %>
+  <section class="empty"><p>เรื่องนี้ยังไม่มีตอนที่แปลเสร็จ</p></section>
+<% } else { %>
+
+<div class="toc-tools">
+  <div class="sizes">
+    ต่อหน้า:
+    <% for (const s of sizes) { %>
+      <a class="chip<%= s === size ? ' active' : '' %>" href="<%= pageHref(1, s) %>"><%= s %></a>
+    <% } %>
+  </div>
+  <% if (savedRef) { %>
+    <a class="btn btn-primary" href="/read/<%= enc(novel) %>">อ่านต่อ →</a>
+  <% } %>
+</div>
+
+<ol class="toc">
+<% for (const c of chapters) { %>
+  <li class="toc-row<%= c.ref === savedRef ? ' current' : '' %>">
+    <a href="/read/<%= enc(novel) %>/<%= enc(c.ref) %>">
+      <span class="toc-no"><%= c.no %></span>
+      <span class="toc-title"><%= c.title || c.ref %></span>
+      <% if (c.ref === savedRef) { %><span class="tag tag-here">อ่านค้าง</span><% } %>
+    </a>
+  </li>
+<% } %>
+</ol>
+
+<% if (pages > 1) { %>
+<%
+  // a window of pages around the current one — 1,915 chapters at 100/page is 20
+  // links, but 50/page is 39, which wraps on a phone
+  const from = Math.max(1, pageNo - 3);
+  const to = Math.min(pages, pageNo + 3);
+%>
+<nav class="pager">
+  <% if (pageNo > 1) { %><a class="btn btn-sm" href="<%= pageHref(pageNo - 1) %>">← ก่อนหน้า</a><% } %>
+  <% if (from > 1) { %>
+    <a class="chip" href="<%= pageHref(1) %>">1</a>
+    <% if (from > 2) { %><span class="muted">…</span><% } %>
+  <% } %>
+  <% for (let p = from; p <= to; p++) { %>
+    <a class="chip<%= p === pageNo ? ' active' : '' %>" href="<%= pageHref(p) %>"><%= p %></a>
+  <% } %>
+  <% if (to < pages) { %>
+    <% if (to < pages - 1) { %><span class="muted">…</span><% } %>
+    <a class="chip" href="<%= pageHref(pages) %>"><%= pages %></a>
+  <% } %>
+  <% if (pageNo < pages) { %><a class="btn btn-sm" href="<%= pageHref(pageNo + 1) %>">ถัดไป →</a><% } %>
+</nav>
+<% } %>
+
+<% } %>
+
+<%- include('_foot') %>

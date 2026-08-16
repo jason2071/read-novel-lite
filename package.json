@@ -1,0 +1,14 @@
+{
+  "name": "read-novel",
+  "version": "1.0.0",
+  "description": "เว็บอ่านนิยายแปลจากโฟลเดอร์ data/",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0"
+  }
+}

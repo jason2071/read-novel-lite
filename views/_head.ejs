@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> · อ่านนิยาย</title>
+  <link rel="stylesheet" href="/public/css/app.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>📖</text></svg>">
+</head>
+<body data-page="<%= page %>">
+<header class="topbar">
+  <a class="brand" href="/">📖 อ่านนิยาย</a>
+  <% if (typeof novel !== 'undefined' && novel) { %>
+    <nav class="crumbs">
+      <span class="sep">/</span>
+      <a href="/novel/<%= enc(novel) %>"><%= novel %></a>
+    </nav>
+  <% } %>
+</header>
+<main class="wrap">

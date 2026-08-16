@@ -1,0 +1,124 @@
+<%- include('_head') %>
+
+<%
+  const readHref = (r) => `/read/${enc(novel)}/${enc(r)}`;
+%>
+
+<%# Server values seed the custom properties, so the first paint already uses the
+    reader's chosen size — no flash of default styling before JS runs. %>
+<div id="reader" class="reader"
+     data-novel="<%= novel %>" data-ref="<%= ref %>" data-resume="<%= resumeScroll %>"
+     data-prev="<%= prevRef || '' %>" data-next="<%= nextRef || '' %>"
+     data-reader-theme="<%= reader.theme %>"
+     style="--reader-fs: <%= reader.font_size %>px; --reader-lh: <%= reader.line_height %>;
+            --reader-indent: <%= reader.indent %>em; --reader-gap: <%= reader.para_gap %>em">
+
+  <%# This device's own preference, applied over the server's before the body is
+      painted — hence inline and here rather than in reader.js, which loads at the
+      end of the page and would leave a visible jump from one font size to another.
+      The server value it overrides still matters: it seeds a device that has never
+      set anything, so a new phone starts from your current taste. %>
+  <script>
+    (function () {
+      try {
+        var p = JSON.parse(localStorage.getItem('readerPrefs') || '{}');
+        var el = document.getElementById('reader');
+        if (!el) return;
+        if (p.theme) el.dataset.readerTheme = p.theme;
+        var map = { font_size: ['--reader-fs', 'px'], line_height: ['--reader-lh', ''],
+                    indent: ['--reader-indent', 'em'], para_gap: ['--reader-gap', 'em'] };
+        for (var k in map) {
+          if (typeof p[k] === 'number' && isFinite(p[k])) {
+            el.style.setProperty(map[k][0], p[k] + map[k][1]);
+          }
+        }
+      } catch (e) { /* private mode / disabled storage — keep the server's values */ }
+    })();
+  </script>
+
+  <nav class="reader-bar">
+    <% if (prevRef) { %>
+      <a class="btn btn-sm" href="<%= readHref(prevRef) %>" rel="prev">← ตอนก่อน</a>
+    <% } else { %>
+      <span class="btn btn-sm disabled">← ตอนก่อน</span>
+    <% } %>
+
+    <div class="reader-where">
+      <a class="reader-novel" href="/novel/<%= enc(novel) %>"><%= novel %></a>
+      <span class="reader-chapter"><%= chapter %><% if (position) { %> · <%= position %><% } %></span>
+    </div>
+
+    <button type="button" class="btn btn-sm" id="btn-reader-settings"
+            title="โหมดการอ่าน ขนาดตัวอักษร ระยะห่าง">⚙ การอ่าน</button>
+
+    <%# next sits at the right edge — it is the one control pressed over and over,
+        so it gets the corner the thumb already rests on %>
+    <% if (nextRef) { %>
+      <a class="btn btn-sm" href="<%= readHref(nextRef) %>" rel="next">ตอนถัดไป →</a>
+    <% } else { %>
+      <span class="btn btn-sm disabled">ตอนถัดไป →</span>
+    <% } %>
+  </nav>
+
+  <article id="reader-body" class="reader-body">
+    <% if (heading) { %><h1 class="reader-title"><%= heading %></h1><% } %>
+    <% for (const para of paragraphs) { %><p><%= para %></p><% } %>
+  </article>
+
+  <nav class="reader-bar reader-bar-foot">
+    <a class="btn btn-sm" href="/novel/<%= enc(novel) %>">☰ สารบัญ</a>
+    <% if (prevRef) { %>
+      <a class="btn btn-sm" href="<%= readHref(prevRef) %>">← ตอนก่อน</a>
+    <% } else { %>
+      <span class="btn btn-sm disabled">← ตอนก่อน</span>
+    <% } %>
+    <% if (nextRef) { %>
+      <a class="btn btn-sm btn-primary" href="<%= readHref(nextRef) %>">ตอนถัดไป →</a>
+    <% } else { %>
+      <span class="btn btn-sm disabled">ตอนถัดไป →</span>
+    <% } %>
+  </nav>
+</div>
+
+<dialog id="reader-settings" class="modal">
+  <header class="modal-header">
+    <strong>การอ่าน</strong>
+    <button class="icon-btn" id="btn-close-settings" aria-label="ปิด">×</button>
+  </header>
+  <div class="modal-form">
+    <div class="field">
+      <span>โหมดการอ่าน</span>
+      <div class="theme-row">
+        <% for (const [slug, label, glyph] of [['light','สว่าง','☀'], ['dark','มืด','☾'], ['sepia','ซีเปีย','▤']]) { %>
+        <button type="button" class="theme-btn theme-<%= slug %><%= reader.theme === slug ? ' active' : '' %>"
+                data-theme="<%= slug %>">
+          <span class="theme-glyph"><%= glyph %></span>
+          <span class="theme-label"><%= label %></span>
+        </button>
+        <% } %>
+      </div>
+    </div>
+
+    <%# min/max here must match RANGES in lib/prefs.js, which clamps whatever
+        arrives — the slider is the affordance, not the guard %>
+    <% for (const [key, label, lo, hi, step, loTxt, hiTxt, unit] of [
+         ['font_size',   'ขนาดตัวอักษร',    14,  40, 1,   '14px', '40px', 'px'],
+         ['line_height', 'ระยะห่างบรรทัด',  1.2, 3,  0.1, '1.2',  '3.0',  ''],
+         ['indent',      'ย่อหน้า',         0,   5,  0.5, 'ไม่ย่อหน้า', '5em', 'em'],
+         ['para_gap',    'ระยะห่างย่อหน้า', 0,   3,  0.1, '0',    '3em',  'em'] ]) { %>
+    <div class="field reader-slider">
+      <div class="slider-head">
+        <span><%= label %></span>
+        <output id="out-<%= key %>"><%= reader[key] %><%= unit %></output>
+      </div>
+      <input type="range" id="rng-<%= key %>" data-key="<%= key %>" data-unit="<%= unit %>"
+             min="<%= lo %>" max="<%= hi %>" step="<%= step %>" value="<%= reader[key] %>">
+      <div class="slider-scale"><span><%= loTxt %></span><span><%= hiTxt %></span></div>
+    </div>
+    <% } %>
+  </div>
+</dialog>
+
+<script src="/public/js/reader.js" defer></script>
+
+<%- include('_foot') %>
