@@ -216,15 +216,20 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
    #reader, not a re-render. */
 .reader { --reader-fs: 20px; --reader-lh: 1.9; --reader-indent: 2em; --reader-gap: .8em; }
 .reader-bar {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-  flex-wrap: wrap;
   padding: 0 1rem;
   margin-bottom: 1.25rem;
 }
-.reader-bar-foot { margin: 2rem 0 0; justify-content: space-between; }
-.reader-where { flex: 1; min-width: 0; text-align: center; }
+.reader-bar-foot { margin: 2rem 0 0; }
+/* prev / centre / next, at the same three positions in both bars — space-between
+   pins the two ends to the edges and the middle control stays centred as long as
+   the two ends are of similar width, which they are (they say the same thing). */
+.reader-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+}
+.reader-where { min-width: 0; text-align: center; margin-bottom: .5rem; }
 .reader-novel {
   display: block;
   font-size: .85rem;
@@ -315,8 +320,7 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
 /* ------------------------------------------------------------------ phone */
 
 @media (max-width: 40rem) {
-  .reader-bar { gap: .35rem; }
-  .reader-where { order: -1; flex-basis: 100%; }
+  .reader-nav { gap: .35rem; }
   .card-actions { width: 100%; }
   .card-actions .btn { flex: 1; justify-content: center; }
   .toc-no { min-width: 2.6rem; }

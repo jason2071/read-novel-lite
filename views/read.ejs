@@ -37,29 +37,33 @@
   </script>
 
   <nav class="reader-bar">
-    <% if (prevRef) { %>
-      <a class="btn btn-sm" href="<%= readHref(prevRef) %>" rel="prev">← ตอนก่อน</a>
-    <% } else { %>
-      <span class="btn btn-sm disabled">← ตอนก่อน</span>
-    <% } %>
-
     <%# The book title doubles as the way back to its chapter list — the app
-        header is gone from this page, so this is where "where am I" lives. %>
+        header is gone from this page, so this is where "where am I" lives.
+        It gets its own row so the three controls below can hold the same
+        left/centre/right positions in both bars. %>
     <div class="reader-where">
       <a class="reader-novel" href="/novel/<%= enc(novel) %>" title="สารบัญ"><%= novel %></a>
       <span class="reader-chapter"><%= chapter %><% if (position) { %> · <%= position %><% } %></span>
     </div>
 
-    <button type="button" class="btn btn-sm" id="btn-reader-settings"
-            title="โหมดการอ่าน ขนาดตัวอักษร ระยะห่าง">⚙ การอ่าน</button>
+    <div class="reader-nav">
+      <% if (prevRef) { %>
+        <a class="btn btn-sm" href="<%= readHref(prevRef) %>" rel="prev">← ตอนก่อน</a>
+      <% } else { %>
+        <span class="btn btn-sm disabled">← ตอนก่อน</span>
+      <% } %>
 
-    <%# next sits at the right edge — it is the one control pressed over and over,
-        so it gets the corner the thumb already rests on %>
-    <% if (nextRef) { %>
-      <a class="btn btn-sm" href="<%= readHref(nextRef) %>" rel="next">ตอนถัดไป →</a>
-    <% } else { %>
-      <span class="btn btn-sm disabled">ตอนถัดไป →</span>
-    <% } %>
+      <button type="button" class="btn btn-sm" id="btn-reader-settings"
+              title="โหมดการอ่าน ขนาดตัวอักษร ระยะห่าง">⚙ การอ่าน</button>
+
+      <%# next sits at the right edge — it is the one control pressed over and
+          over, so it gets the corner the thumb already rests on %>
+      <% if (nextRef) { %>
+        <a class="btn btn-sm" href="<%= readHref(nextRef) %>" rel="next">ตอนถัดไป →</a>
+      <% } else { %>
+        <span class="btn btn-sm disabled">ตอนถัดไป →</span>
+      <% } %>
+    </div>
   </nav>
 
   <article id="reader-body" class="reader-body">
@@ -67,18 +71,24 @@
     <% for (const para of paragraphs) { %><p><%= para %></p><% } %>
   </article>
 
+  <%# Same three positions as the top bar — prev left, next right — so the thumb
+      lands on the same control whichever end of the chapter it is at. %>
   <nav class="reader-bar reader-bar-foot">
-    <a class="btn btn-sm" href="/novel/<%= enc(novel) %>">☰ สารบัญ</a>
-    <% if (prevRef) { %>
-      <a class="btn btn-sm" href="<%= readHref(prevRef) %>">← ตอนก่อน</a>
-    <% } else { %>
-      <span class="btn btn-sm disabled">← ตอนก่อน</span>
-    <% } %>
-    <% if (nextRef) { %>
-      <a class="btn btn-sm btn-primary" href="<%= readHref(nextRef) %>">ตอนถัดไป →</a>
-    <% } else { %>
-      <span class="btn btn-sm disabled">ตอนถัดไป →</span>
-    <% } %>
+    <div class="reader-nav">
+      <% if (prevRef) { %>
+        <a class="btn btn-sm" href="<%= readHref(prevRef) %>">← ตอนก่อน</a>
+      <% } else { %>
+        <span class="btn btn-sm disabled">← ตอนก่อน</span>
+      <% } %>
+
+      <a class="btn btn-sm" href="/novel/<%= enc(novel) %>">☰ สารบัญ</a>
+
+      <% if (nextRef) { %>
+        <a class="btn btn-sm btn-primary" href="<%= readHref(nextRef) %>">ตอนถัดไป →</a>
+      <% } else { %>
+        <span class="btn btn-sm disabled">ตอนถัดไป →</span>
+      <% } %>
+    </div>
   </nav>
 </div>
 
