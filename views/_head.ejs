@@ -8,6 +8,9 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>📖</text></svg>">
 </head>
 <body data-page="<%= page %>">
+<%# The reading page has no app chrome — nothing above the text but the chapter
+    bar it needs. The way back to the shelf is the ☰ button on that bar. %>
+<% if (page !== 'read') { %>
 <header class="topbar">
   <a class="brand" href="/">📖 อ่านนิยาย</a>
   <% if (typeof novel !== 'undefined' && novel) { %>
@@ -17,4 +20,5 @@
     </nav>
   <% } %>
 </header>
+<% } %>
 <main class="wrap">
