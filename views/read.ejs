@@ -4,8 +4,8 @@
   const readHref = (r) => `/read/${enc(novel)}/${enc(r)}`;
 %>
 
-<%# Server values seed the custom properties, so the first paint already uses the
-    reader's chosen size — no flash of default styling before JS runs. %>
+<%# Server defaults seed the custom properties; the browser's saved values below
+    replace them before paint, so there is no flash of the default styling. %>
 <div id="reader" class="reader"
      data-novel="<%= novel %>" data-ref="<%= ref %>" data-resume="<%= resumeScroll %>"
      data-prev="<%= prevRef || '' %>" data-next="<%= nextRef || '' %>"
@@ -13,18 +13,15 @@
      style="--reader-fs: <%= reader.font_size %>px; --reader-lh: <%= reader.line_height %>;
             --reader-indent: <%= reader.indent %>em; --reader-gap: <%= reader.para_gap %>em">
 
-  <%# This device's own preference, applied over the server's before the body is
-      painted — hence inline and here rather than in reader.js, which loads at the
-      end of the page and would leave a visible jump from one font size to another.
-      The server value it overrides still matters: it seeds a device that has never
-      set anything, so a new phone starts from your current taste. %>
+  <%# This browser's own preferences are applied before the body is painted.
+      reader.js loads later, so waiting for it would cause a visible jump. %>
   <script>
     (function () {
       try {
         var p = JSON.parse(localStorage.getItem('readerPrefs') || '{}');
         var el = document.getElementById('reader');
         if (!el) return;
-        if (p.theme) el.dataset.readerTheme = p.theme;
+        if (['light', 'dark', 'sepia'].indexOf(p.theme) >= 0) el.dataset.readerTheme = p.theme;
         var map = { font_size: ['--reader-fs', 'px'], line_height: ['--reader-lh', ''],
                     indent: ['--reader-indent', 'em'], para_gap: ['--reader-gap', 'em'] };
         for (var k in map) {
@@ -32,7 +29,7 @@
             el.style.setProperty(map[k][0], p[k] + map[k][1]);
           }
         }
-      } catch (e) { /* private mode / disabled storage — keep the server's values */ }
+      } catch (e) { /* private mode / disabled storage — keep the defaults */ }
     })();
   </script>
 

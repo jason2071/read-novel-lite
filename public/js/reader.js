@@ -15,12 +15,27 @@
     indent: ['--reader-indent', 'em'],
     para_gap: ['--reader-gap', 'em']
   };
+  var THEMES = ['light', 'dark', 'sepia'];
+  var RANGES = {
+    font_size: [14, 40],
+    line_height: [1.2, 3],
+    indent: [0, 5],
+    para_gap: [0, 3]
+  };
 
   // ------------------------------------------------------------ local prefs
 
   function localPrefs() {
     try {
-      return JSON.parse(localStorage.getItem('readerPrefs') || '{}');
+      var raw = JSON.parse(localStorage.getItem('readerPrefs') || '{}');
+      var prefs = {};
+      if (!raw || typeof raw !== 'object') return prefs;
+      if (THEMES.indexOf(raw.theme) >= 0) prefs.theme = raw.theme;
+      for (var key in RANGES) {
+        if (typeof raw[key] !== 'number' || !isFinite(raw[key])) continue;
+        prefs[key] = Math.min(RANGES[key][1], Math.max(RANGES[key][0], raw[key]));
+      }
+      return prefs;
     } catch (e) {
       return {};
     }
@@ -31,7 +46,22 @@
       var p = localPrefs();
       for (var k in patch) p[k] = patch[k];
       localStorage.setItem('readerPrefs', JSON.stringify(p));
-    } catch (e) { /* private mode — the server copy still holds */ }
+    } catch (e) { /* private mode / disabled storage — changes last for this page only */ }
+  }
+
+  function applyPrefs(prefs) {
+    if (prefs.theme) reader.dataset.readerTheme = prefs.theme;
+    for (var key in CSS_VAR) {
+      if (typeof prefs[key] !== 'number') continue;
+      reader.style.setProperty(CSS_VAR[key][0], prefs[key] + CSS_VAR[key][1]);
+      var input = document.getElementById('rng-' + key);
+      var out = document.getElementById('out-' + key);
+      if (input) input.value = prefs[key];
+      if (out) out.textContent = prefs[key] + (input ? input.dataset.unit || '' : '');
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('.theme-btn'), function (btn) {
+      btn.classList.toggle('active', btn.dataset.theme === reader.dataset.readerTheme);
+    });
   }
 
   // ------------------------------------------------------------- server I/O
@@ -39,8 +69,8 @@
   var pending = null;
   var postTimer = null;
 
-  // Slider drags and scroll pings both land here; one debounced POST carries
-  // whatever accumulated, so dragging a slider is not one request per pixel.
+  // Scroll pings are coalesced so continuous reading does not mean one request
+  // per scroll event. Appearance settings deliberately never leave this device.
   function post(patch, delay) {
     pending = Object.assign(pending || {}, patch);
     if (postTimer) clearTimeout(postTimer);
@@ -71,7 +101,6 @@
       var patch = {};
       patch[key] = value;
       rememberLocally(patch);
-      post(patch);
     });
   });
 
@@ -85,9 +114,13 @@
         b.classList.toggle('active', b === btn);
       });
       rememberLocally({ theme: theme });
-      post({ theme: theme }, 0);
     });
   });
+
+  // The inline script applied these values before the reader was painted.
+  // Repeat it here after the controls exist so their selected state and labels
+  // match the content on this particular browser.
+  applyPrefs(localPrefs());
 
   // ------------------------------------------------------------------ modal
 

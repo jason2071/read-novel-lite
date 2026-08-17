@@ -191,7 +191,6 @@ app.get('/read/:novel/:chapter', async (req, res, next) => {
     const nextRef = idx >= 0 && idx < refs.length - 1 ? refs[idx + 1] : null;
 
     const { heading, paragraphs } = splitTitleBody(text);
-    const settings = prefs.load();
     const saved = prefs.progressFor(novel);
     const savedRef = saved
       ? (saved.ref.startsWith(novel + '/') ? saved.ref.slice(novel.length + 1) : saved.ref)
@@ -208,7 +207,7 @@ app.get('/read/:novel/:chapter', async (req, res, next) => {
       prevRef,
       nextRef,
       position: idx >= 0 ? `${idx + 1} / ${refs.length}` : '',
-      reader: settings,
+      reader: prefs.READER_DEFAULTS,
       // only restore the offset when the bookmark is THIS chapter
       resumeScroll: savedRef === chapter ? (saved.scroll || 0) : 0,
     });
@@ -221,7 +220,6 @@ app.get('/read/:novel/:chapter', async (req, res, next) => {
 
 app.post('/api/reader', async (req, res) => {
   const body = req.body || {};
-  prefs.savePrefs(body);
   if (typeof body.novel === 'string' && typeof body.ref === 'string') {
     const novel = safeName(body.novel);
     const ref = safeName(body.ref.includes('/') ? body.ref.split('/').pop() : body.ref);
