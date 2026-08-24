@@ -224,7 +224,8 @@ app.post('/api/reader', async (req, res) => {
     const novel = safeName(body.novel);
     const ref = safeName(body.ref.includes('/') ? body.ref.split('/').pop() : body.ref);
     if (novel && ref && resolveWithin(novel, 'chapters', ref)) {
-      prefs.saveProgress(novel, `${novel}/${ref}`, body.scroll);
+      const refs = await chapterRefs(novel);
+      if (refs.includes(ref)) prefs.saveProgress(novel, `${novel}/${ref}`, body.scroll, refs);
     }
   }
   res.json(prefs.load());
