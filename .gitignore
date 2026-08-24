@@ -1,13 +1,17 @@
+# Dependencies
 node_modules/
 
-# The novels themselves: translated third-party fiction, hundreds of thousands of
-# files, and reader.json holds personal reading positions. The app reads whatever
-# is in data/ at runtime — see README.md for the layout it expects.
-data/
-
+# Runtime logs
 npm-debug.log*
 *.log
+
+# Local configuration
 .env
+
+# Generated codebase graph
+graphify-out/
+
+# Editor and operating-system files
 .DS_Store
 Thumbs.db
 .vscode/
