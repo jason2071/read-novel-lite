@@ -16,6 +16,27 @@ npm start
 
 เปลี่ยนพอร์ต/ที่อยู่: `PORT=8080 npm start` (ค่าเริ่มต้นฟังทุก interface จึงเปิดจากมือถือใน LAN เดียวกันได้ที่ `http://<ip เครื่อง>:3000`)
 
+### ใช้ข้อมูลจาก Translator โดยไม่ต้องมี data/ ซ้ำ
+
+กำหนด `NOVEL_DATA_DIR` ให้ชี้ไปที่โฟลเดอร์ `data` ของ Translator ก่อนเริ่มเว็บ
+(ทั้งการอ่านนิยายและ `reader.json` จะใช้ตำแหน่งนี้)
+
+PowerShell:
+
+```powershell
+$env:NOVEL_DATA_DIR = 'C:\Users\Mac\Works\Translator\data'
+npm start
+```
+
+CMD:
+
+```bat
+set "NOVEL_DATA_DIR=C:\Users\Mac\Works\Translator\data"
+npm start
+```
+
+หากไม่ได้กำหนดค่า โปรแกรมจะกลับไปใช้ `read-novel/data` เพื่อให้โปรเจกต์ยังรันแบบแยกเดี่ยวได้
+
 ## หน้าเว็บ
 
 | ที่อยู่ | ทำอะไร |
@@ -30,7 +51,7 @@ npm start
 
 ## ข้อมูล
 
-อ่านจาก `data/` ตรงๆ ไม่มีการ import:
+อ่านจาก `NOVEL_DATA_DIR` โดยตรง (หรือ `data/` เมื่อไม่ได้ตั้งค่า) ไม่มีการ import:
 
 ```
 data/
