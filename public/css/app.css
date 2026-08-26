@@ -21,6 +21,14 @@
     --border: #313136;
     --accent: #c3a37c;
   }
+  .card-cover {
+    color: hsl(var(--h) 55% 72%);
+    background: color-mix(in srgb, hsl(var(--h) 55% 55%) 22%, var(--panel));
+  }
+  .card:hover { border-color: hsl(var(--h) 40% 55%); }
+  .card-title:hover { color: hsl(var(--h) 55% 72%); }
+  .card-resume { border-left-color: hsl(var(--h) 50% 60%); }
+  .card-resume strong { color: hsl(var(--h) 55% 72%); }
 }
 
 * { box-sizing: border-box; }
@@ -62,7 +70,7 @@ code {
 .crumbs a { text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .crumbs a:hover { text-decoration: underline; }
 
-.wrap { max-width: 62rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+.wrap { max-width: 68rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
 /* the reader lays out its own full-bleed surface, so the shell gets out of its way */
 body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
 
@@ -131,20 +139,34 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
   gap: .9rem;
 }
 .card {
+  --h: 40;
   display: flex;
   flex-direction: column;
-  gap: .6rem;
-  padding: 1.1rem 1.1rem 1rem;
+  gap: .65rem;
+  padding: 1.1rem 1.1rem .95rem;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
-  transition: border-color .15s, box-shadow .15s, transform .15s;
+  transition: border-color .15s, box-shadow .2s, transform .2s;
 }
 .card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, .09);
-  transform: translateY(-2px);
+  border-color: hsl(var(--h) 45% 60%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .10);
+  transform: translateY(-3px);
+}
+.card-top { display: flex; gap: .9rem; align-items: flex-start; }
+.card-cover {
+  flex: none;
+  width: 3.1rem;
+  height: 3.1rem;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: hsl(var(--h) 45% 40%);
+  background: color-mix(in srgb, hsl(var(--h) 55% 42%) 13%, var(--panel));
 }
 .card-main { flex: 1; min-width: 0; }
 .card-title {
@@ -152,36 +174,36 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  font-size: 1.05rem;
-  font-weight: 600;
-  line-height: 1.45;
+  font-size: 1.12rem;
+  font-weight: 700;
+  line-height: 1.4;
   text-decoration: none;
 }
-.card-title:hover { color: var(--accent); }
+.card-title:hover { color: hsl(var(--h) 45% 40%); }
 .card-meta {
   display: flex;
   align-items: center;
   gap: .5rem;
   flex-wrap: wrap;
-  margin-top: .25rem;
+  margin-top: .3rem;
   font-size: .85rem;
   color: var(--text-muted);
 }
 .card-resume {
-  margin-top: .4rem;
-  padding: .35rem .6rem;
-  border-left: 3px solid var(--accent);
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  margin-top: .1rem;
+  padding: .4rem .65rem;
+  border-left: 3px solid hsl(var(--h) 55% 45%);
+  border-radius: 6px;
+  background: color-mix(in srgb, hsl(var(--h) 55% 42%) 7%, transparent);
   font-size: .85rem;
   color: var(--text-muted);
 }
-.card-resume strong { color: var(--accent); font-weight: 600; }
+.card-resume strong { color: hsl(var(--h) 45% 40%); font-weight: 600; }
 .card-actions {
   display: flex;
   gap: .5rem;
   margin-top: auto;
-  padding-top: .6rem;
+  padding-top: .65rem;
   border-top: 1px solid var(--border);
 }
 .card-actions .btn-primary { margin-right: auto; }
@@ -196,14 +218,15 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
 .searchbar input[type="search"] {
   flex: 1;
   min-width: 0;
-  padding: .45rem .7rem;
+  padding: .5rem .9rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 999px;
   background: var(--panel);
   color: inherit;
   font: inherit;
 }
 .searchbar input[type="search"]:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.searchbar .btn { border-radius: 999px; }
 .search-note { margin: .7rem 0 0; font-size: .9rem; color: var(--text-muted); }
 
 .toc-tools {
