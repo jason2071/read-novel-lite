@@ -30,12 +30,9 @@
       <a class="card-title" href="/novel/<%= enc(n.name) %>"><%= n.name %></a>
       <div class="card-meta">
         <span><%= n.count.toLocaleString('th-TH') %> ตอน</span>
-        <% if (n.profile.status === 'completed') { %><span class="tag tag-done">จบแล้ว</span><% } %>
-        <% if (n.profile.status === 'ongoing') { %><span class="tag">ยังไม่จบ</span><% } %>
-        <% for (const g of (n.profile.genres || [])) { %><span class="tag"><%= g %></span><% } %>
       </div>
       <% if (n.resume) { %>
-        <div class="card-resume">อ่านค้างไว้ตอนที่ <%= n.resume.position %></div>
+        <div class="card-resume">📖 อ่านค้างไว้ <strong>ตอนที่ <%= n.resume.position %></strong></div>
       <% } %>
     </div>
     <%# Reading opens in its own tab, so the shelf stays where it was — browsing
