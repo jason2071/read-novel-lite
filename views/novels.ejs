@@ -24,22 +24,16 @@
 <% } %>
 
 <ul class="shelf">
-<% for (const n of novels) {
-     // Per-book accent hue, derived from the name — every card gets its own colour.
-     const hue = [...n.name].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 7);
-  %>
-  <li class="card" style="--h: <%= hue %>">
-    <div class="card-top">
-      <div class="card-cover" aria-hidden="true"><%= n.name.trim()[0] %></div>
-      <div class="card-main">
-        <a class="card-title" href="/novel/<%= enc(n.name) %>"><%= n.name %></a>
-        <div class="card-meta">
-          <span><%= n.count.toLocaleString('th-TH') %> ตอน</span>
-        </div>
+<% for (const n of novels) { %>
+  <li class="card<%= n.resume ? ' card-reading' : '' %>">
+    <div class="card-main">
+      <a class="card-title" href="/novel/<%= enc(n.name) %>"><%= n.name %></a>
+      <div class="card-meta">
+        <span><%= n.count.toLocaleString('th-TH') %> ตอน</span>
       </div>
     </div>
     <% if (n.resume) { %>
-      <div class="card-resume">อ่านค้างไว้ <strong>ตอนที่ <%= n.resume.position %></strong></div>
+      <div class="card-resume">อ่านถึง <strong>ตอนที่ <%= n.resume.position %></strong></div>
     <% } %>
     <%# Reading opens in its own tab, so the shelf stays where it was — browsing
         and reading are separate activities here. rel=noopener because target
@@ -50,7 +44,7 @@
       <% } else if (n.firstRef) { %>
         <a class="btn btn-primary" href="/read/<%= enc(n.name) %>/<%= enc(n.firstRef) %>" target="_blank" rel="noopener">เริ่มอ่าน</a>
       <% } %>
-      <a class="btn" href="/novel/<%= enc(n.name) %>">สารบัญ</a>
+      <a class="card-toc" href="/novel/<%= enc(n.name) %>">สารบัญ</a>
     </div>
   </li>
 <% } %>

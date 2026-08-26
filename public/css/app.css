@@ -21,14 +21,6 @@
     --border: #313136;
     --accent: #c3a37c;
   }
-  .card-cover {
-    color: hsl(var(--h) 55% 72%);
-    background: color-mix(in srgb, hsl(var(--h) 55% 55%) 22%, var(--panel));
-  }
-  .card:hover { border-color: hsl(var(--h) 40% 55%); }
-  .card-title:hover { color: hsl(var(--h) 55% 72%); }
-  .card-resume { border-left-color: hsl(var(--h) 50% 60%); }
-  .card-resume strong { color: hsl(var(--h) 55% 72%); }
 }
 
 * { box-sizing: border-box; }
@@ -136,39 +128,23 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
   padding: 0;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: .9rem;
+  gap: .7rem;
 }
 .card {
-  --h: 40;
   display: flex;
   flex-direction: column;
-  gap: .65rem;
-  padding: 1.1rem 1.1rem .95rem;
+  gap: .4rem;
+  padding: .9rem 1rem .75rem;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
-  transition: border-color .15s, box-shadow .2s, transform .2s;
+  transition: border-color .15s, background .15s;
 }
 .card:hover {
-  border-color: hsl(var(--h) 45% 60%);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .10);
-  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
 }
-.card-top { display: flex; gap: .9rem; align-items: flex-start; }
-.card-cover {
-  flex: none;
-  width: 3.1rem;
-  height: 3.1rem;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: hsl(var(--h) 45% 40%);
-  background: color-mix(in srgb, hsl(var(--h) 55% 42%) 13%, var(--panel));
-}
-.card-main { flex: 1; min-width: 0; }
+.card-reading { border-left: 3px solid var(--accent); padding-left: .875rem; }
+.card-main { min-width: 0; }
 .card-title {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -179,7 +155,7 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
   line-height: 1.4;
   text-decoration: none;
 }
-.card-title:hover { color: hsl(var(--h) 45% 40%); }
+.card-title:hover { color: var(--accent); }
 .card-meta {
   display: flex;
   align-items: center;
@@ -191,22 +167,29 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
 }
 .card-resume {
   margin-top: .1rem;
-  padding: .4rem .65rem;
-  border-left: 3px solid hsl(var(--h) 55% 45%);
-  border-radius: 6px;
-  background: color-mix(in srgb, hsl(var(--h) 55% 42%) 7%, transparent);
   font-size: .85rem;
   color: var(--text-muted);
 }
-.card-resume strong { color: hsl(var(--h) 45% 40%); font-weight: 600; }
+.card-resume strong { color: var(--text); font-weight: 600; }
 .card-actions {
   display: flex;
+  align-items: center;
   gap: .5rem;
   margin-top: auto;
-  padding-top: .65rem;
+  padding-top: .45rem;
   border-top: 1px solid var(--border);
 }
-.card-actions .btn-primary { margin-right: auto; }
+.card-actions .btn {
+  padding: .2rem 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--accent);
+  font-size: .9rem;
+  font-weight: 700;
+}
+.card-actions .btn:hover { text-decoration: underline; }
+.card-toc { margin-left: auto; color: var(--text-muted); font-size: .9rem; text-decoration: none; }
+.card-toc:hover { color: var(--text); text-decoration: underline; }
 
 /* -------------------------------------------------------- table of contents */
 
@@ -383,8 +366,8 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
 @media (max-width: 40rem) {
   .shelf { grid-template-columns: 1fr; }
   .reader-nav { gap: .35rem; }
-  .card-actions { width: 100%; }
-  .card-actions .btn { flex: 1; justify-content: center; }
+  .card-actions .btn { min-height: 2.75rem; padding: .2rem .35rem; }
+  .card-toc { min-height: 2.75rem; display: inline-flex; align-items: center; padding: .2rem .35rem; }
   .toc-no { min-width: 2.6rem; }
   /* Text-sized controls come out 29–33px tall, under the 44px a thumb needs —
      and the pager wraps to two rows on a phone, so a miss lands on the wrong
