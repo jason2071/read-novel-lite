@@ -39,51 +39,48 @@ app.locals.enc = enc;
 
 // ------------------------------------------------------------------ shelf
 
+async function shelfNovels(q = '') {
+  const all = await listNovels();
+  // Search covers both title and genre, because both appear on the shelf.
+  const needle = q.toLowerCase();
+  const novels = needle
+    ? all.filter((n) => n.name.toLowerCase().includes(needle) ||
+                        (n.profile.genres || []).some((g) => String(g).toLowerCase().includes(needle)))
+    : all;
+
+  // A bookmark may point at a novel that is no longer in data/, or at a
+  // chapter that has since been deleted — resolve it against the real refs.
+  for (const n of novels) {
+    const saved = prefs.progressFor(n.name);
+    n.resume = null;
+    if (saved) {
+      const refs = await chapterRefs(n.name);
+      const ref = saved.ref.startsWith(n.name + '/') ? saved.ref.slice(n.name.length + 1) : saved.ref;
+      const idx = refs.indexOf(ref);
+      if (idx >= 0) n.resume = { ref, position: idx + 1, at: saved.at };
+    }
+  }
+
+  // Most recently read first. Bookmarks without a timestamp are still kept
+  // above books that have never been opened.
+  const readAt = (n) => (n.resume?.at ? Date.parse(n.resume.at) || 0 : 0);
+  const tier = (n) => (readAt(n) ? 0 : n.resume ? 1 : 2);
+  novels.sort((a, b) => {
+    const ta = tier(a);
+    const tb = tier(b);
+    if (ta !== tb) return ta - tb;
+    if (ta === 0) return readAt(b) - readAt(a);
+    return a.name.localeCompare(b.name, 'th');
+  });
+
+  return { all, novels };
+}
+
 app.get('/', async (req, res, next) => {
   try {
-    const all = await listNovels();
     const q = typeof req.query.q === 'string' ? req.query.q.trim().slice(0, 100) : '';
-    // Title and genre, because both are on the card: someone who sees "cultivation"
-    // there and types it expects that to be a way to narrow the shelf.
-    const needle = q.toLowerCase();
-    const novels = needle
-      ? all.filter((n) => n.name.toLowerCase().includes(needle) ||
-                          (n.profile.genres || []).some((g) => String(g).toLowerCase().includes(needle)))
-      : all;
-
-    // A bookmark may point at a novel that is no longer in data/, or at a
-    // chapter that has since been deleted — resolve it against the real refs.
-    for (const n of novels) {
-      const saved = prefs.progressFor(n.name);
-      n.resume = null;
-      if (saved) {
-        const refs = await chapterRefs(n.name);
-        const ref = saved.ref.startsWith(n.name + '/') ? saved.ref.slice(n.name.length + 1) : saved.ref;
-        const idx = refs.indexOf(ref);
-        if (idx >= 0) n.resume = { ref, position: idx + 1, at: saved.at };
-      }
-    }
-
-    // Most recently read first — the shelf is a list of things in progress, and
-    // the one opened last is the one being read now.
-    //
-    // Three tiers, because a bookmark may have no timestamp: the reader.json
-    // that came with data/ carries entries with at: "", and sorting those as
-    // epoch 0 would bury books that are actually being read below untouched
-    // ones. So: timestamped (newest first), then bookmarked-but-undated, then
-    // never opened — each tier by title.
-    // Date.parse, not a string compare: the file mixes this app's "…847Z" with
-    // the Python side's "…678138+00:00", and those only sort alike while the
-    // offset happens to be +00:00.
-    const readAt = (n) => (n.resume?.at ? Date.parse(n.resume.at) || 0 : 0);
-    const tier = (n) => (readAt(n) ? 0 : n.resume ? 1 : 2);
-    novels.sort((a, b) => {
-      const ta = tier(a);
-      const tb = tier(b);
-      if (ta !== tb) return ta - tb;
-      if (ta === 0) return readAt(b) - readAt(a);
-      return a.name.localeCompare(b.name, 'th');
-    });
+    const { all, novels } = await shelfNovels(q);
+    const allContinue = novels.filter((n) => n.resume);
 
     res.render('novels', {
       page: 'novels',
@@ -91,6 +88,23 @@ app.get('/', async (req, res, next) => {
       novels,
       q,
       total: all.length,
+      continueCount: allContinue.length,
+      continueNovels: q ? [] : allContinue.slice(0, 4),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/continue', async (_req, res, next) => {
+  try {
+    const { novels } = await shelfNovels();
+    const continueNovels = novels.filter((n) => n.resume);
+    res.render('continue', {
+      page: 'continue',
+      title: 'อ่านต่อ',
+      novels: continueNovels,
+      total: continueNovels.length,
     });
   } catch (err) {
     next(err);

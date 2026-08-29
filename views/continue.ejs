@@ -1,0 +1,31 @@
+<%- include('_head') %>
+
+<div class="page-heading">
+  <h1 class="page-title">อ่านต่อ <span class="muted"><%= total %> เรื่อง</span></h1>
+  <a class="section-link" href="/">ชั้นหนังสือ</a>
+</div>
+
+<% if (novels.length) { %>
+  <ul class="book-list continue-page-list">
+  <% for (const n of novels) { %>
+    <li class="book-row">
+      <div class="book-info">
+        <a class="book-title" href="/novel/<%= enc(n.name) %>" title="<%= n.name %>"><%= n.name %></a>
+        <div class="book-meta"><span><%= n.count.toLocaleString('th-TH') %> ตอน</span></div>
+        <div class="book-progress">
+          <span>อ่านถึง <strong>ตอนที่ <%= n.resume.position %></strong></span>
+          <span><%= n.resume.position.toLocaleString('th-TH') %> / <%= n.count.toLocaleString('th-TH') %></span>
+        </div>
+      </div>
+      <a class="book-action" href="/read/<%= enc(n.name) %>" target="_blank" rel="noopener">อ่านต่อ</a>
+    </li>
+  <% } %>
+  </ul>
+<% } else { %>
+  <section class="empty">
+    <p>ยังไม่มีเรื่องที่กำลังอ่าน</p>
+    <a class="btn" href="/">ไปเลือกนิยาย</a>
+  </section>
+<% } %>
+
+<%- include('_foot') %>

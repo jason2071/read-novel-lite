@@ -2,24 +2,28 @@
    which carries its own three themes and ignores the shell's colours. */
 
 :root {
-  --bg: #f6f6f7;
+  --bg: #fff;
   --panel: #fff;
-  --text: #1c1c1e;
-  --text-muted: #7a7a80;
-  --border: #dedee2;
-  --accent: #7a5c3e;
-  --radius: 10px;
-  --radius-sm: 7px;
+  --text: #16333a;
+  --text-muted: #648087;
+  --border: #d4e9eb;
+  --accent: #009bb0;
+  --accent-soft: #e4f7f8;
+  --shadow: 0 12px 30px rgba(20, 116, 130, .1);
+  --radius: 14px;
+  --radius-sm: 9px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #141416;
-    --panel: #1d1d20;
-    --text: #e6e6e8;
-    --text-muted: #8c8c94;
-    --border: #313136;
-    --accent: #c3a37c;
+    --bg: #0d1d21;
+    --panel: #14282d;
+    --text: #e0f7f8;
+    --text-muted: #9bbcc1;
+    --border: #29434a;
+    --accent: #48d4df;
+    --accent-soft: #1d3b42;
+    --shadow: 0 12px 30px rgba(0, 0, 0, .25);
   }
 }
 
@@ -50,23 +54,24 @@ code {
   align-items: center;
   gap: .5rem;
   flex-wrap: wrap;
-  padding: .7rem 1rem;
+  padding: .75rem max(1rem, calc((100vw - 70rem) / 2));
   border-bottom: 1px solid var(--border);
-  background: var(--panel);
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  backdrop-filter: blur(14px);
   position: sticky;
   top: 0;
   z-index: 5;
 }
-.brand { font-weight: 700; text-decoration: none; }
+.brand { font-weight: 750; letter-spacing: -.015em; text-decoration: none; }
 .crumbs { display: flex; gap: .5rem; min-width: 0; font-size: .9rem; color: var(--text-muted); }
 .crumbs a { text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .crumbs a:hover { text-decoration: underline; }
 
-.wrap { max-width: 68rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+.wrap { max-width: 70rem; margin: 0 auto; padding: 2rem 1rem 4rem; }
 /* the reader lays out its own full-bleed surface, so the shell gets out of its way */
 body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
 
-.page-title { font-size: 1.4rem; margin: 0 0 .5rem; }
+.page-title { font-size: clamp(1.45rem, 2vw, 1.75rem); letter-spacing: -.035em; margin: 0 0 .5rem; }
 .muted { color: var(--text-muted); font-weight: 400; }
 .small { font-size: .85rem; }
 
@@ -83,7 +88,7 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
   display: inline-flex;
   align-items: center;
   gap: .35rem;
-  padding: .45rem .8rem;
+  padding: .48rem .9rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--panel);
@@ -93,7 +98,7 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
   cursor: pointer;
   white-space: nowrap;
 }
-.btn:hover { border-color: var(--accent); }
+.btn:hover { border-color: var(--accent); background: var(--accent-soft); }
 .btn-sm { padding: .3rem .6rem; font-size: .85rem; }
 .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
 .btn.disabled { opacity: .35; pointer-events: none; }
@@ -122,41 +127,111 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
 
 /* ------------------------------------------------------------------ shelf */
 
-.shelf {
-  list-style: none;
-  margin: 1.2rem 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: .7rem;
-}
-.card {
+.continue-section { margin-top: 1.8rem; }
+.catalog-section { margin-top: 2.2rem; }
+.shelf-section-head {
   display: flex;
-  flex-direction: column;
-  gap: .4rem;
-  padding: .9rem 1rem .75rem;
-  background: var(--panel);
+  align-items: baseline;
+  gap: .55rem;
+  margin-bottom: .8rem;
+}
+.shelf-section-head h2 { margin: 0; font-size: 1.05rem; letter-spacing: -.02em; }
+.shelf-section-head span { color: var(--text-muted); font-size: .85rem; }
+.section-link {
+  margin-left: auto;
+  color: var(--accent);
+  font-size: .85rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+.section-link:hover { text-decoration: underline; }
+.page-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.page-heading .page-title { margin: 0; }
+.continue-list {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(18rem, 23rem);
+  gap: .9rem;
+  overflow-x: auto;
+  padding: 0 0 .5rem;
+  scroll-snap-type: x proximity;
+}
+.continue-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: .55rem;
+  min-height: 9.25rem;
+  padding: 1.05rem 1.1rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  transition: border-color .15s, background .15s;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  scroll-snap-align: start;
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
 }
-.card:hover {
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+.continue-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  border-radius: var(--radius) 0 0 var(--radius);
+  background: var(--accent);
 }
-.card-reading { border-left: 3px solid var(--accent); padding-left: .875rem; }
-.card-main { min-width: 0; }
-.card-title {
+.continue-card:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); box-shadow: 0 14px 32px rgba(20, 116, 130, .18); transform: translateY(-2px); }
+.continue-title {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  font-size: 1.12rem;
-  font-weight: 700;
+  font-weight: 750;
   line-height: 1.4;
   text-decoration: none;
 }
-.card-title:hover { color: var(--accent); }
-.card-meta {
+.continue-title:hover { color: var(--accent); text-decoration: underline; }
+.continue-card p { display: flex; gap: .55rem; flex-wrap: wrap; margin: 0; color: var(--text-muted); font-size: .85rem; }
+.continue-card p strong { color: var(--text); }
+.continue-card p span { color: var(--text-muted); }
+.continue-card .book-action { justify-self: start; }
+.book-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.book-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: .9rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  transition: background .15s, padding .15s;
+}
+.book-row:hover {
+  background: color-mix(in srgb, var(--accent) 7%, var(--panel));
+}
+.book-info { flex: 1; min-width: 0; }
+.book-title {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.025rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+.book-title:hover { color: var(--accent); text-decoration: underline; }
+.book-meta {
   display: flex;
   align-items: center;
   gap: .5rem;
@@ -165,51 +240,51 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
   font-size: .85rem;
   color: var(--text-muted);
 }
-.card-resume {
-  margin-top: .1rem;
-  font-size: .85rem;
-  color: var(--text-muted);
-}
-.card-resume strong { color: var(--text); font-weight: 600; }
-.card-actions {
+.book-progress {
   display: flex;
-  align-items: center;
-  gap: .5rem;
-  margin-top: auto;
-  padding-top: .45rem;
-  border-top: 1px solid var(--border);
+  gap: .55rem;
+  flex-wrap: wrap;
+  margin-top: .2rem;
+  color: var(--text-muted);
+  font-size: .85rem;
 }
-.card-actions .btn {
-  padding: .2rem 0;
-  border-color: transparent;
-  background: transparent;
+.book-progress strong { color: var(--text); }
+.book-action {
+  flex: none;
+  min-width: 4.75rem;
+  padding: .43rem .7rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+  border-radius: 999px;
+  background: var(--accent-soft);
   color: var(--accent);
   font-size: .9rem;
   font-weight: 700;
+  text-align: center;
+  text-decoration: none;
 }
-.card-actions .btn:hover { text-decoration: underline; }
-.card-toc { margin-left: auto; color: var(--text-muted); font-size: .9rem; text-decoration: none; }
-.card-toc:hover { color: var(--text); text-decoration: underline; }
+.book-action:hover { border-color: var(--accent); background: var(--accent); color: #fff; }
 
 /* -------------------------------------------------------- table of contents */
 
 .searchbar {
   display: flex;
   gap: .5rem;
-  margin: 1.2rem 0 0;
+  margin: 1.35rem 0 0;
 }
 .searchbar input[type="search"] {
   flex: 1;
   min-width: 0;
-  padding: .5rem .9rem;
+  padding: .58rem 1rem;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: var(--panel);
+  background: color-mix(in srgb, var(--panel) 88%, var(--accent-soft));
   color: inherit;
   font: inherit;
 }
-.searchbar input[type="search"]:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.searchbar input[type="search"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; background: var(--panel); }
 .searchbar .btn { border-radius: 999px; }
+.searchbar button.btn { border-color: var(--accent); background: var(--accent); color: #fff; }
+.searchbar button.btn:hover { filter: brightness(1.06); }
 .search-note { margin: .7rem 0 0; font-size: .9rem; color: var(--text-muted); }
 
 .toc-tools {
@@ -364,10 +439,12 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
 /* ------------------------------------------------------------------ phone */
 
 @media (max-width: 40rem) {
-  .shelf { grid-template-columns: 1fr; }
   .reader-nav { gap: .35rem; }
-  .card-actions .btn { min-height: 2.75rem; padding: .2rem .35rem; }
-  .card-toc { min-height: 2.75rem; display: inline-flex; align-items: center; padding: .2rem .35rem; }
+  .continue-list { grid-auto-columns: minmax(82vw, 22rem); }
+  .book-row { align-items: flex-start; gap: .65rem; padding: .75rem .8rem; }
+  .book-title { white-space: normal; }
+  .book-meta { margin-top: .15rem; }
+  .book-action { min-height: 2.75rem; display: inline-flex; align-items: center; justify-content: center; }
   .toc-no { min-width: 2.6rem; }
   /* Text-sized controls come out 29–33px tall, under the 44px a thumb needs —
      and the pager wraps to two rows on a phone, so a miss lands on the wrong

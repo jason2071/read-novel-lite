@@ -23,31 +23,53 @@
   </section>
 <% } %>
 
-<ul class="shelf">
-<% for (const n of novels) { %>
-  <li class="card<%= n.resume ? ' card-reading' : '' %>">
-    <div class="card-main">
-      <a class="card-title" href="/novel/<%= enc(n.name) %>"><%= n.name %></a>
-      <div class="card-meta">
-        <span><%= n.count.toLocaleString('th-TH') %> ตอน</span>
-      </div>
+<% if (continueNovels.length) { %>
+  <section class="continue-section" aria-labelledby="continue-heading">
+    <div class="shelf-section-head">
+      <h2 id="continue-heading">อ่านต่อ</h2>
+      <span><%= continueCount %> เรื่อง</span>
+      <a class="section-link" href="/continue">ดูทั้งหมด</a>
     </div>
-    <% if (n.resume) { %>
-      <div class="card-resume">อ่านถึง <strong>ตอนที่ <%= n.resume.position %></strong></div>
+    <div class="continue-list">
+    <% for (const n of continueNovels) { %>
+      <article class="continue-card">
+        <a class="continue-title" href="/novel/<%= enc(n.name) %>" title="<%= n.name %>"><%= n.name %></a>
+        <p>อ่านถึง <strong>ตอนที่ <%= n.resume.position %></strong><span><%= n.resume.position.toLocaleString('th-TH') %> / <%= n.count.toLocaleString('th-TH') %></span></p>
+        <a class="book-action" href="/read/<%= enc(n.name) %>" target="_blank" rel="noopener">อ่านต่อ</a>
+      </article>
     <% } %>
-    <%# Reading opens in its own tab, so the shelf stays where it was — browsing
-        and reading are separate activities here. rel=noopener because target
-        _blank otherwise hands the new page a handle on this one. %>
-    <div class="card-actions">
-      <% if (n.resume) { %>
-        <a class="btn btn-primary" href="/read/<%= enc(n.name) %>" target="_blank" rel="noopener">อ่านต่อ</a>
-      <% } else if (n.firstRef) { %>
-        <a class="btn btn-primary" href="/read/<%= enc(n.name) %>/<%= enc(n.firstRef) %>" target="_blank" rel="noopener">เริ่มอ่าน</a>
-      <% } %>
-      <a class="card-toc" href="/novel/<%= enc(n.name) %>">สารบัญ</a>
     </div>
-  </li>
+  </section>
 <% } %>
-</ul>
+
+<% if (novels.length) { %>
+  <section class="catalog-section" aria-labelledby="catalog-heading">
+    <div class="shelf-section-head">
+      <h2 id="catalog-heading"><%= q ? 'ผลการค้นหา' : 'นิยายทั้งหมด' %></h2>
+      <span><%= q ? `${novels.length} เรื่อง` : `${total} เรื่อง` %></span>
+    </div>
+    <ul class="book-list">
+  <% for (const n of novels) { %>
+      <li class="book-row">
+        <div class="book-info">
+          <a class="book-title" href="/novel/<%= enc(n.name) %>" title="<%= n.name %>"><%= n.name %></a>
+          <div class="book-meta">
+            <span><%= n.count.toLocaleString('th-TH') %> ตอน</span>
+          </div>
+        </div>
+        <%# The title goes to the table of contents. The only row action opens
+            the next chapter, which keeps the shelf quick to scan. %>
+        <% if (n.resume || n.firstRef) { %>
+          <% if (n.resume) { %>
+            <a class="book-action" href="/read/<%= enc(n.name) %>" target="_blank" rel="noopener">อ่านต่อ</a>
+          <% } else { %>
+            <a class="book-action" href="/read/<%= enc(n.name) %>/<%= enc(n.firstRef) %>" target="_blank" rel="noopener">เริ่มอ่าน</a>
+          <% } %>
+        <% } %>
+      </li>
+  <% } %>
+    </ul>
+  </section>
+<% } %>
 
 <%- include('_foot') %>
