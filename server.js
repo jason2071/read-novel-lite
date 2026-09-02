@@ -44,14 +44,14 @@ async function shelfNovels(q = '') {
   const all = await listNovels();
   // Search covers both title and genre, because both appear on the shelf.
   const needle = q.toLowerCase();
-  const novels = needle
+  const catalog = needle
     ? all.filter((n) => n.name.toLowerCase().includes(needle) ||
                         (n.profile.genres || []).some((g) => String(g).toLowerCase().includes(needle)))
     : all;
 
   // A bookmark may point at a novel that is no longer in data/, or at a
   // chapter that has since been deleted — resolve it against the real refs.
-  for (const n of novels) {
+  for (const n of catalog) {
     const saved = prefs.progressFor(n.name);
     n.resume = null;
     if (saved) {
@@ -62,32 +62,27 @@ async function shelfNovels(q = '') {
     }
   }
 
-  // Most recently read first. Bookmarks without a timestamp are still kept
-  // above books that have never been opened.
+  // Only the dedicated Continue shelf is ordered by recent reading.  The main
+  // catalogue stays in its normal library order, so its pager always means
+  // "all novels" rather than "the books I happened to open most recently".
   const readAt = (n) => (n.resume?.at ? Date.parse(n.resume.at) || 0 : 0);
-  const tier = (n) => (readAt(n) ? 0 : n.resume ? 1 : 2);
-  novels.sort((a, b) => {
-    const ta = tier(a);
-    const tb = tier(b);
-    if (ta !== tb) return ta - tb;
-    if (ta === 0) return readAt(b) - readAt(a);
-    return a.name.localeCompare(b.name, 'th');
-  });
+  const continueNovels = catalog.filter((n) => n.resume);
+  continueNovels.sort((a, b) => readAt(b) - readAt(a) || a.name.localeCompare(b.name, 'th'));
 
-  return { all, novels };
+  return { all, catalog, continueNovels };
 }
 
 app.get('/', async (req, res, next) => {
   try {
     const q = typeof req.query.q === 'string' ? req.query.q.trim().slice(0, 100) : '';
-    const { all, novels } = await shelfNovels(q);
-    const allContinue = novels.filter((n) => n.resume);
+    const { all, catalog, continueNovels } = await shelfNovels(q);
 
-    // The sort needs a bookmark lookup for every novel, so paging happens after
-    // sorting — it only decides which 20 rows actually render.
-    const pages = Math.max(1, Math.ceil(novels.length / SHELF_PAGE_SIZE));
+    // Page only the catalogue.  Continue reading is a separate shelf that stays
+    // visible while moving between catalogue pages, so it never shifts a novel
+    // into an unexpected page.
+    const pages = Math.max(1, Math.ceil(catalog.length / SHELF_PAGE_SIZE));
     const pageNo = Math.min(pages, Math.max(1, Number(req.query.page) || 1));
-    const slice = novels.slice((pageNo - 1) * SHELF_PAGE_SIZE, pageNo * SHELF_PAGE_SIZE);
+    const slice = catalog.slice((pageNo - 1) * SHELF_PAGE_SIZE, pageNo * SHELF_PAGE_SIZE);
 
     res.render('novels', {
       page: 'novels',
@@ -95,13 +90,13 @@ app.get('/', async (req, res, next) => {
       novels: slice,
       q,
       total: all.length,
-      matchCount: novels.length,
+      matchCount: catalog.length,
       pageNo,
       pages,
-      continueCount: allContinue.length,
-      // the อ่านต่อ strip belongs to the first page — it would push the actual
-      // shelf down on every later page
-      continueNovels: q || pageNo > 1 ? [] : allContinue.slice(0, 4),
+      continueCount: continueNovels.length,
+      // Keep this shortcut shelf on every unfiltered catalogue page.  Its own
+      // "ดูทั้งหมด" page handles a longer list without changing pagination.
+      continueNovels: q ? [] : continueNovels.slice(0, 4),
     });
   } catch (err) {
     next(err);
@@ -110,8 +105,7 @@ app.get('/', async (req, res, next) => {
 
 app.get('/continue', async (_req, res, next) => {
   try {
-    const { novels } = await shelfNovels();
-    const continueNovels = novels.filter((n) => n.resume);
+    const { continueNovels } = await shelfNovels();
     res.render('continue', {
       page: 'continue',
       title: 'อ่านต่อ',

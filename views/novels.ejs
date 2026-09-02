@@ -10,8 +10,8 @@
 </form>
 
 <%
-  // one place builds a shelf link, so the page number and the search term never
-  // drift apart
+  // One place builds a catalogue link, so the page number and the search term
+  // never drift apart.  Continue reading is intentionally outside this pager.
   const pageHref = (p) => `/?page=${p}` + (q ? `&q=${enc(q)}` : '');
 %>
 
