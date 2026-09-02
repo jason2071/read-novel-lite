@@ -25,6 +25,7 @@ const HOST = process.env.HOST || '0.0.0.0';
 
 const PAGE_SIZES = [50, 100, 200, 500];
 const DEFAULT_SIZE = 100;
+const SHELF_PAGE_SIZE = 20;
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -82,14 +83,25 @@ app.get('/', async (req, res, next) => {
     const { all, novels } = await shelfNovels(q);
     const allContinue = novels.filter((n) => n.resume);
 
+    // The sort needs a bookmark lookup for every novel, so paging happens after
+    // sorting — it only decides which 20 rows actually render.
+    const pages = Math.max(1, Math.ceil(novels.length / SHELF_PAGE_SIZE));
+    const pageNo = Math.min(pages, Math.max(1, Number(req.query.page) || 1));
+    const slice = novels.slice((pageNo - 1) * SHELF_PAGE_SIZE, pageNo * SHELF_PAGE_SIZE);
+
     res.render('novels', {
       page: 'novels',
       title: q ? `ค้นหา “${q}”` : 'ชั้นหนังสือ',
-      novels,
+      novels: slice,
       q,
       total: all.length,
+      matchCount: novels.length,
+      pageNo,
+      pages,
       continueCount: allContinue.length,
-      continueNovels: q ? [] : allContinue.slice(0, 4),
+      // the อ่านต่อ strip belongs to the first page — it would push the actual
+      // shelf down on every later page
+      continueNovels: q || pageNo > 1 ? [] : allContinue.slice(0, 4),
     });
   } catch (err) {
     next(err);

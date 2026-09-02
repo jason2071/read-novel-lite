@@ -9,10 +9,16 @@
   <% if (q) { %><a class="btn" href="/">ล้าง</a><% } %>
 </form>
 
+<%
+  // one place builds a shelf link, so the page number and the search term never
+  // drift apart
+  const pageHref = (p) => `/?page=${p}` + (q ? `&q=${enc(q)}` : '');
+%>
+
 <% if (q) { %>
   <p class="search-note">
-    <% if (novels.length) { %>
-      พบ <strong><%= novels.length %></strong> เรื่อง จากคำว่า “<%= q %>”
+    <% if (matchCount) { %>
+      พบ <strong><%= matchCount %></strong> เรื่อง จากคำว่า “<%= q %>”
     <% } else { %>
       ไม่พบนิยายที่ตรงกับ “<%= q %>”
     <% } %>
@@ -46,7 +52,7 @@
   <section class="catalog-section" aria-labelledby="catalog-heading">
     <div class="shelf-section-head">
       <h2 id="catalog-heading"><%= q ? 'ผลการค้นหา' : 'นิยายทั้งหมด' %></h2>
-      <span><%= q ? `${novels.length} เรื่อง` : `${total} เรื่อง` %></span>
+      <span><%= q ? `${matchCount} เรื่อง` : `${total} เรื่อง` %></span>
     </div>
     <ul class="book-list">
   <% for (const n of novels) { %>
@@ -69,6 +75,29 @@
       </li>
   <% } %>
     </ul>
+
+<%# Same windowed pager as the table of contents — the CSS classes already exist. %>
+<% if (pages > 1) { %>
+<%
+  const from = Math.max(1, pageNo - 3);
+  const to = Math.min(pages, pageNo + 3);
+%>
+    <nav class="pager">
+      <% if (pageNo > 1) { %><a class="btn btn-sm" href="<%= pageHref(pageNo - 1) %>">← ก่อนหน้า</a><% } %>
+      <% if (from > 1) { %>
+        <a class="chip" href="<%= pageHref(1) %>">1</a>
+        <% if (from > 2) { %><span class="muted">…</span><% } %>
+      <% } %>
+      <% for (let p = from; p <= to; p++) { %>
+        <a class="chip<%= p === pageNo ? ' active' : '' %>" href="<%= pageHref(p) %>"><%= p %></a>
+      <% } %>
+      <% if (to < pages) { %>
+        <% if (to < pages - 1) { %><span class="muted">…</span><% } %>
+        <a class="chip" href="<%= pageHref(pages) %>"><%= pages %></a>
+      <% } %>
+      <% if (pageNo < pages) { %><a class="btn btn-sm" href="<%= pageHref(pageNo + 1) %>">ถัดไป →</a><% } %>
+    </nav>
+<% } %>
   </section>
 <% } %>
 
