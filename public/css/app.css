@@ -137,6 +137,23 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
 }
 .shelf-section-head h2 { margin: 0; font-size: 1.05rem; letter-spacing: -.02em; }
 .shelf-section-head span { color: var(--text-muted); font-size: .85rem; }
+.catalog-order { margin-left: auto; }
+.catalog-order label {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  color: var(--text-muted);
+  font-size: .85rem;
+}
+.catalog-order select {
+  min-width: 8rem;
+  padding: .28rem .45rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+}
 .section-link {
   margin-left: auto;
   color: var(--accent);

@@ -26,6 +26,14 @@ const HOST = process.env.HOST || '0.0.0.0';
 const PAGE_SIZES = [50, 100, 200, 500];
 const DEFAULT_SIZE = 100;
 const SHELF_PAGE_SIZE = 20;
+const CATALOG_SORTS = new Set([
+  'name',
+  'chapters-desc',
+  'chapters-asc',
+  'updated-desc',
+  'added-desc',
+]);
+const DEFAULT_CATALOG_SORT = 'updated-desc';
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -72,10 +80,25 @@ async function shelfNovels(q = '') {
   return { all, catalog, continueNovels };
 }
 
+function catalogSort(value) {
+  return CATALOG_SORTS.has(value) ? value : DEFAULT_CATALOG_SORT;
+}
+
+function sortCatalog(novels, sort) {
+  const byName = (a, b) => a.name.localeCompare(b.name, 'th');
+  if (sort === 'chapters-desc') return [...novels].sort((a, b) => b.count - a.count || byName(a, b));
+  if (sort === 'chapters-asc') return [...novels].sort((a, b) => a.count - b.count || byName(a, b));
+  if (sort === 'updated-desc') return [...novels].sort((a, b) => b.updatedAt - a.updatedAt || byName(a, b));
+  if (sort === 'added-desc') return [...novels].sort((a, b) => b.addedAt - a.addedAt || byName(a, b));
+  return [...novels].sort(byName);
+}
+
 app.get('/', async (req, res, next) => {
   try {
     const q = typeof req.query.q === 'string' ? req.query.q.trim().slice(0, 100) : '';
-    const { all, catalog, continueNovels } = await shelfNovels(q);
+    const sort = catalogSort(typeof req.query.sort === 'string' ? req.query.sort : '');
+    const { all, catalog: unsortedCatalog, continueNovels } = await shelfNovels(q);
+    const catalog = sortCatalog(unsortedCatalog, sort);
 
     // Page only the catalogue.  Continue reading is a separate shelf that stays
     // visible while moving between catalogue pages, so it never shifts a novel
@@ -89,6 +112,7 @@ app.get('/', async (req, res, next) => {
       title: q ? `ค้นหา “${q}”` : 'ชั้นหนังสือ',
       novels: slice,
       q,
+      sort,
       total: all.length,
       matchCount: catalog.length,
       pageNo,

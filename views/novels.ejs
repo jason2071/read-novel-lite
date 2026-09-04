@@ -3,16 +3,17 @@
 <h1 class="page-title">ชั้นหนังสือ <span class="muted"><%= total %> เรื่อง</span></h1>
 
 <form class="searchbar" method="get" action="/" role="search">
+  <input type="hidden" name="sort" value="<%= sort %>">
   <input type="search" name="q" value="<%= q %>" placeholder="ค้นหาชื่อเรื่อง หรือแนว"
          aria-label="ค้นหานิยาย" autocomplete="off">
   <button class="btn" type="submit">ค้นหา</button>
-  <% if (q) { %><a class="btn" href="/">ล้าง</a><% } %>
+  <% if (q) { %><a class="btn" href="/?sort=<%= enc(sort) %>">ล้าง</a><% } %>
 </form>
 
 <%
-  // One place builds a catalogue link, so the page number and the search term
-  // never drift apart.  Continue reading is intentionally outside this pager.
-  const pageHref = (p) => `/?page=${p}` + (q ? `&q=${enc(q)}` : '');
+  // One place builds a catalogue link, so the page number, search term, and
+  // selected order never drift apart. Continue reading is outside this pager.
+  const pageHref = (p) => `/?page=${p}&sort=${enc(sort)}` + (q ? `&q=${enc(q)}` : '');
 %>
 
 <% if (q) { %>
@@ -53,6 +54,21 @@
     <div class="shelf-section-head">
       <h2 id="catalog-heading"><%= q ? 'ผลการค้นหา' : 'นิยายทั้งหมด' %></h2>
       <span><%= q ? `${matchCount} เรื่อง` : `${total} เรื่อง` %></span>
+      <form class="catalog-order" method="get" action="/">
+        <% if (q) { %><input type="hidden" name="q" value="<%= q %>"><% } %>
+        <input type="hidden" name="page" value="1">
+        <label>
+          เรียง
+          <select name="sort" onchange="this.form.submit()" aria-label="เรียงลำดับนิยายทั้งหมด">
+            <option value="name"<%= sort === 'name' ? ' selected' : '' %>>ชื่อเรื่อง ก-ฮ</option>
+            <option value="chapters-desc"<%= sort === 'chapters-desc' ? ' selected' : '' %>>ตอนมากสุด</option>
+            <option value="chapters-asc"<%= sort === 'chapters-asc' ? ' selected' : '' %>>ตอนน้อยสุด</option>
+            <option value="updated-desc"<%= sort === 'updated-desc' ? ' selected' : '' %>>อัปเดตล่าสุด</option>
+            <option value="added-desc"<%= sort === 'added-desc' ? ' selected' : '' %>>เพิ่มล่าสุด</option>
+          </select>
+        </label>
+        <button hidden type="submit">เรียงลำดับ</button>
+      </form>
     </div>
     <ul class="book-list">
   <% for (const n of novels) { %>
