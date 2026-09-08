@@ -5,22 +5,44 @@
   <a class="section-link" href="/">ชั้นหนังสือ</a>
 </div>
 
+<%
+  const pageHref = (p, s = size) => `/continue?page=${p}&size=${s}`;
+%>
+
 <% if (novels.length) { %>
-  <ul class="book-list continue-page-list">
+  <ul class="continue-page-list">
   <% for (const n of novels) { %>
-    <li class="book-row">
-      <div class="book-info">
-        <a class="book-title" href="/novel/<%= enc(n.name) %>" title="<%= n.name %>"><%= n.name %></a>
-        <div class="book-meta"><span><%= n.count.toLocaleString('th-TH') %> ตอน</span></div>
-        <div class="book-progress">
-          <span>อ่านถึง <strong>ตอนที่ <%= n.resume.position %></strong></span>
-          <span><%= n.resume.position.toLocaleString('th-TH') %> / <%= n.count.toLocaleString('th-TH') %></span>
+    <li class="continue-page-row">
+      <a class="continue-page-cover" href="/novel/<%= enc(n.name) %>" tabindex="-1" aria-hidden="true">
+        <% if (n.coverVersion) { %><img src="/cover/<%= enc(n.name) %>?v=<%= n.coverVersion %>" alt=""><% } else { %><span>📖</span><% } %>
+      </a>
+      <div class="continue-page-info">
+        <a class="continue-page-title" href="/novel/<%= enc(n.name) %>" title="<%= n.name %>"><%= n.name %></a>
+        <div class="continue-page-meta">
+          <span>อ่านถึงตอนที่ <strong><%= n.resume.position.toLocaleString('th-TH') %></strong></span>
+          <span class="tag tag-here">อ่านค้างอยู่</span>
         </div>
+        <% if (n.updatedLabel) { %><span class="continue-page-updated">◷ อัปเดต <%= n.updatedLabel %></span><% } %>
       </div>
-      <a class="book-action" href="/read/<%= enc(n.name) %>" target="_blank" rel="noopener">อ่านต่อ</a>
+      <a class="continue-page-action" href="/read/<%= enc(n.name) %>" target="_blank" rel="noopener">• อ่านต่อ</a>
     </li>
   <% } %>
   </ul>
+
+  <% if (pages > 1) { %>
+  <nav class="pager" aria-label="หน้ารายการอ่านต่อ">
+    <% if (pageNo > 1) { %><a class="btn btn-sm" href="<%= pageHref(pageNo - 1) %>">← ก่อนหน้า</a><% } %>
+    <% for (let p = Math.max(1, pageNo - 2); p <= Math.min(pages, pageNo + 2); p++) { %>
+      <a class="chip<%= p === pageNo ? ' active' : '' %>" href="<%= pageHref(p) %>"><%= p %></a>
+    <% } %>
+    <% if (pageNo < pages) { %><a class="btn btn-sm" href="<%= pageHref(pageNo + 1) %>">ถัดไป →</a><% } %>
+  </nav>
+  <% } %>
+
+  <div class="continue-page-size" aria-label="จำนวนเรื่องต่อหน้า">
+    <span>ต่อหน้า:</span>
+    <% for (const s of sizes) { %><a class="chip<%= s === size ? ' active' : '' %>" href="<%= pageHref(1, s) %>"><%= s %></a><% } %>
+  </div>
 <% } else { %>
   <section class="empty">
     <p>ยังไม่มีเรื่องที่กำลังอ่าน</p>

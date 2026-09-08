@@ -40,9 +40,14 @@
     <div class="continue-list">
     <% for (const n of continueNovels) { %>
       <article class="continue-card">
-        <a class="continue-title" href="/novel/<%= enc(n.name) %>" title="<%= n.name %>"><%= n.name %></a>
-        <p>อ่านถึง <strong>ตอนที่ <%= n.resume.position %></strong><span><%= n.resume.position.toLocaleString('th-TH') %> / <%= n.count.toLocaleString('th-TH') %></span></p>
-        <a class="book-action" href="/read/<%= enc(n.name) %>" target="_blank" rel="noopener">อ่านต่อ</a>
+        <a class="continue-cover" href="/novel/<%= enc(n.name) %>" tabindex="-1" aria-hidden="true">
+          <% if (n.coverVersion) { %><img src="/cover/<%= enc(n.name) %>?v=<%= n.coverVersion %>" alt=""><% } else { %><span>📖</span><% } %>
+        </a>
+        <div class="continue-body">
+          <a class="continue-title" href="/novel/<%= enc(n.name) %>" title="<%= n.name %>"><%= n.name %></a>
+          <p>อ่านถึงตอนที่ <strong><%= n.resume.position.toLocaleString('th-TH') %></strong></p>
+          <a class="continue-action" href="/read/<%= enc(n.name) %>" target="_blank" rel="noopener">• อ่านต่อ</a>
+        </div>
       </article>
     <% } %>
     </div>
@@ -70,27 +75,34 @@
         <button hidden type="submit">เรียงลำดับ</button>
       </form>
     </div>
-    <ul class="book-list">
+    <div class="catalog-grid">
   <% for (const n of novels) { %>
-      <li class="book-row">
-        <div class="book-info">
-          <a class="book-title" href="/novel/<%= enc(n.name) %>" title="<%= n.name %>"><%= n.name %></a>
-          <div class="book-meta">
-            <span><%= n.count.toLocaleString('th-TH') %> ตอน</span>
+      <article class="catalog-card">
+        <a class="catalog-cover" href="/novel/<%= enc(n.name) %>" tabindex="-1" aria-hidden="true">
+          <% if (n.coverVersion) { %><img src="/cover/<%= enc(n.name) %>?v=<%= n.coverVersion %>" alt=""><% } else { %><span>📖</span><% } %>
+        </a>
+        <div class="catalog-card-body">
+          <a class="catalog-title" href="/novel/<%= enc(n.name) %>" title="<%= n.name %>"><%= n.name %></a>
+          <div class="catalog-tags">
+            <% if (n.profile.status === 'completed') { %><span class="tag tag-done">จบแล้ว</span><% } else { %><span class="tag">กำลังอัปเดต</span><% } %>
+            <% for (const g of (n.profile.genres || [])) { %><span class="tag"><%= g %></span><% } %>
           </div>
-        </div>
-        <%# The title goes to the table of contents. The only row action opens
-            the next chapter, which keeps the shelf quick to scan. %>
+          <div class="catalog-meta">
+            <span>☷ <%= n.count.toLocaleString('th-TH') %> ตอน</span>
+            <% if (n.updatedLabel) { %><span>◷ <%= n.updatedLabel %></span><% } %>
+          </div>
+          <%# The title opens details; this opens the useful reading destination. %>
         <% if (n.resume || n.firstRef) { %>
           <% if (n.resume) { %>
-            <a class="book-action" href="/read/<%= enc(n.name) %>" target="_blank" rel="noopener">อ่านต่อ</a>
+            <a class="catalog-action" href="/read/<%= enc(n.name) %>" target="_blank" rel="noopener">อ่านต่อ</a>
           <% } else { %>
-            <a class="book-action" href="/read/<%= enc(n.name) %>/<%= enc(n.firstRef) %>" target="_blank" rel="noopener">เริ่มอ่าน</a>
+            <a class="catalog-action" href="/read/<%= enc(n.name) %>/<%= enc(n.firstRef) %>" target="_blank" rel="noopener">เริ่มอ่าน</a>
           <% } %>
         <% } %>
-      </li>
+        </div>
+      </article>
   <% } %>
-    </ul>
+    </div>
 
 <%# Same windowed pager as the table of contents — the CSS classes already exist. %>
 <% if (pages > 1) { %>

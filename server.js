@@ -11,6 +11,8 @@ import {
   chapterRefs,
   chapterText,
   chapterTitles,
+  coverInfo,
+  latestReadableUpdate,
   listNovels,
   novelProfile,
   resolveWithin,
@@ -24,7 +26,9 @@ const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 
 const PAGE_SIZES = [50, 100, 200, 500];
-const DEFAULT_SIZE = 100;
+const DEFAULT_SIZE = 50;
+const CONTINUE_PAGE_SIZES = [20, 50, 100, 200];
+const DEFAULT_CONTINUE_SIZE = 20;
 const SHELF_PAGE_SIZE = 20;
 const CATALOG_SORTS = new Set([
   'name',
@@ -45,6 +49,25 @@ app.use(express.json({ limit: '16kb' }));
 
 const enc = encodeURIComponent;
 app.locals.enc = enc;
+const thaiDate = new Intl.DateTimeFormat('th-TH', {
+  day: 'numeric', month: 'short', year: 'numeric',
+});
+const updatedLabel = (time) => time ? thaiDate.format(new Date(time)) : '';
+
+// Covers are uploaded by Translator into the shared novel directory.  Keep the
+// lookup behind the same name/path guard as the rest of this app — the view only
+// sees a URL and never a filesystem path.
+app.get('/cover/:novel', async (req, res, next) => {
+  try {
+    const novel = safeName(req.params.novel);
+    const cover = novel ? await coverInfo(novel) : null;
+    if (!cover) return res.sendStatus(404);
+    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    return res.type(cover.mediaType).sendFile(cover.file);
+  } catch (err) {
+    next(err);
+  }
+});
 
 // ------------------------------------------------------------------ shelf
 
@@ -68,6 +91,7 @@ async function shelfNovels(q = '') {
       const idx = refs.indexOf(ref);
       if (idx >= 0) n.resume = { ref, position: idx + 1, at: saved.at };
     }
+    n.updatedLabel = updatedLabel(n.updatedAt);
   }
 
   // Only the dedicated Continue shelf is ordered by recent reading.  The main
@@ -127,14 +151,23 @@ app.get('/', async (req, res, next) => {
   }
 });
 
-app.get('/continue', async (_req, res, next) => {
+app.get('/continue', async (req, res, next) => {
   try {
     const { continueNovels } = await shelfNovels();
+    const size = CONTINUE_PAGE_SIZES.includes(Number(req.query.size))
+      ? Number(req.query.size) : DEFAULT_CONTINUE_SIZE;
+    const pages = Math.max(1, Math.ceil(continueNovels.length / size));
+    const pageNo = Math.min(pages, Math.max(1, Number(req.query.page) || 1));
+    const novels = continueNovels.slice((pageNo - 1) * size, pageNo * size);
     res.render('continue', {
       page: 'continue',
       title: 'อ่านต่อ',
-      novels: continueNovels,
+      novels,
       total: continueNovels.length,
+      pageNo,
+      pages,
+      size,
+      sizes: CONTINUE_PAGE_SIZES,
     });
   } catch (err) {
     next(err);
@@ -150,8 +183,10 @@ app.get('/novel/:novel', async (req, res, next) => {
 
     const profile = await novelProfile(novel);
     if (!profile) return res.status(404).render('error', errCtx(404, 'ไม่พบนิยายเรื่องนี้'));
+    const cover = await coverInfo(novel);
 
     const refs = await chapterRefs(novel);
+    const lastUpdated = await latestReadableUpdate(novel, refs);
     const q = typeof req.query.q === 'string' ? req.query.q.trim().slice(0, 100) : '';
 
     // A search result set is paged exactly like the full list, so the two share
@@ -182,6 +217,9 @@ app.get('/novel/:novel', async (req, res, next) => {
       title: q ? `ค้นหา “${q}” · ${novel}` : novel,
       novel,
       profile,
+      coverVersion: cover?.version ?? null,
+      updatedLabel: updatedLabel(lastUpdated),
+      firstRef: refs[0] || null,
       total: refs.length,
       q,
       found: q ? rows.length : null,

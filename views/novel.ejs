@@ -1,12 +1,28 @@
 <%- include('_head') %>
 
-<h1 class="page-title"><%= novel %></h1>
-<div class="card-meta">
-  <span><%= total.toLocaleString('th-TH') %> ตอน</span>
-  <% if (profile.status === 'completed') { %><span class="tag tag-done">จบแล้ว</span><% } %>
-  <% for (const g of (profile.genres || [])) { %><span class="tag"><%= g %></span><% } %>
-  <% if (profile.source_url) { %><a class="muted small" href="<%= profile.source_url %>" rel="noreferrer noopener" target="_blank">ต้นฉบับ ↗</a><% } %>
-</div>
+<section class="novel-hero">
+  <% if (coverVersion) { %><img class="novel-cover" src="/cover/<%= enc(novel) %>?v=<%= coverVersion %>" alt="หน้าปก <%= novel %>"><% } %>
+  <div class="novel-overview">
+    <h1 class="page-title"><%= novel %></h1>
+    <div class="catalog-tags">
+      <% if (profile.status === 'completed') { %><span class="tag tag-done">จบแล้ว</span><% } else { %><span class="tag">กำลังอัปเดต</span><% } %>
+      <% for (const g of (profile.genres || [])) { %><span class="tag"><%= g %></span><% } %>
+    </div>
+    <dl class="novel-stats">
+      <div><dt>จำนวนตอน</dt><dd><%= total.toLocaleString('th-TH') %></dd></div>
+      <div><dt>สถานะ</dt><dd><%= profile.status === 'completed' ? 'จบแล้ว' : 'กำลังอัปเดต' %></dd></div>
+      <% if (updatedLabel) { %><div><dt>อัปเดตล่าสุด</dt><dd><%= updatedLabel %></dd></div><% } %>
+    </dl>
+    <div class="novel-actions">
+      <% if (savedRef) { %>
+        <a class="btn btn-primary" href="/read/<%= enc(novel) %>" target="_blank" rel="noopener">▣ อ่านต่อ</a>
+      <% } else if (firstRef) { %>
+        <a class="btn btn-primary" href="/read/<%= enc(novel) %>/<%= enc(firstRef) %>" target="_blank" rel="noopener">▣ เริ่มอ่าน</a>
+      <% } %>
+      <% if (profile.source_url) { %><a class="btn" href="<%= profile.source_url %>" rel="noreferrer noopener" target="_blank">ต้นฉบับ ↗</a><% } %>
+    </div>
+  </div>
+</section>
 
 <%
   // one place builds a link to this same list, so page/size and the search term
@@ -38,20 +54,18 @@
 <% } %>
 
 <div class="toc-tools">
+  <h2 class="toc-heading">สารบัญ</h2>
   <div class="sizes">
     ต่อหน้า:
     <% for (const s of sizes) { %>
       <a class="chip<%= s === size ? ' active' : '' %>" href="<%= pageHref(1, s) %>"><%= s %></a>
     <% } %>
   </div>
-  <% if (savedRef) { %>
-    <a class="btn btn-primary" href="/read/<%= enc(novel) %>" target="_blank" rel="noopener">อ่านต่อ →</a>
-  <% } %>
 </div>
 
 <%# Each chapter opens in its own tab, so this list — and any search that led to
     it — is still here when the tab is closed. %>
-<ol class="toc">
+<ol class="toc toc-grid">
 <% for (const c of chapters) { %>
   <li class="toc-row<%= c.ref === savedRef ? ' current' : '' %>">
     <a href="/read/<%= enc(novel) %>/<%= enc(c.ref) %>" target="_blank" rel="noopener">
