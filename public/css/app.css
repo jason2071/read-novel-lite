@@ -2,27 +2,30 @@
    which carries its own three themes and ignores the shell's colours. */
 
 :root {
-  --bg: #fff;
-  --panel: #fff;
-  --text: #16333a;
-  --text-muted: #648087;
-  --border: #d4e9eb;
-  --accent: #009bb0;
-  --accent-soft: #e4f7f8;
-  --shadow: 0 12px 30px rgba(20, 116, 130, .1);
+  /* Soft Paper: warm-neutral surfaces keep a long shelf session from feeling
+     like a white lightbox; the muted blue-green still gives controls a clear,
+     accessible home without shouting at the surrounding text. */
+  --bg: #f4f5f2;
+  --panel: #fbfcfa;
+  --text: #26343a;
+  --text-muted: #69767a;
+  --border: #dbe1de;
+  --accent: #527b7a;
+  --accent-soft: #e5eeeb;
+  --shadow: 0 10px 26px rgba(38, 52, 58, .08);
   --radius: 14px;
   --radius-sm: 9px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0d1d21;
-    --panel: #14282d;
-    --text: #e0f7f8;
-    --text-muted: #9bbcc1;
-    --border: #29434a;
-    --accent: #48d4df;
-    --accent-soft: #1d3b42;
+    --bg: #182022;
+    --panel: #202a2b;
+    --text: #e5ebe7;
+    --text-muted: #aab6b3;
+    --border: #354243;
+    --accent: #8ab7b3;
+    --accent-soft: #2b4140;
     --shadow: 0 12px 30px rgba(0, 0, 0, .25);
   }
 }
@@ -211,7 +214,7 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
 .continue-card p { display: flex; gap: .55rem; flex-wrap: wrap; margin: .28rem 0 0; color: var(--text-muted); font-size: .78rem; }
 .continue-card p strong { color: var(--text); }
 .continue-card p span { color: var(--text-muted); }
-.continue-action, .continue-page-action { margin-top: auto; padding: .28rem .72rem; border-radius: 999px; background: #dfa608; color: #fff; font-size: .78rem; font-weight: 750; text-decoration: none; }
+.continue-action, .continue-page-action { margin-top: auto; padding: .28rem .72rem; border-radius: 999px; background: #b88931; color: #fff; font-size: .78rem; font-weight: 750; text-decoration: none; }
 .continue-action:hover, .continue-page-action:hover { filter: brightness(1.06); }
 
 .continue-page-list { display: grid; gap: .65rem; margin: 0; padding: 0; list-style: none; }
@@ -444,7 +447,7 @@ body[data-page="read"] .wrap { max-width: none; padding: 1rem 0 3rem; }
 
 /* The theme rides on the article, the only full-bleed element on the page — the
    bars above and below keep the app's own palette. */
-.reader[data-reader-theme="light"] .reader-body { background: #fff; color: #1c1c1e; }
+.reader[data-reader-theme="light"] .reader-body { background: #fbfaf6; color: #26343a; }
 .reader[data-reader-theme="dark"]  .reader-body { background: #1c1c1e; color: #d8d8dc; }
 .reader[data-reader-theme="sepia"] .reader-body { background: #f4ecd8; color: #5b4636; }
 
