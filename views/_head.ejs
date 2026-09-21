@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><%= title %> · Read Novel</title>
   <link rel="stylesheet" href="/public/css/app.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>📖</text></svg>">
+  <link rel="icon" type="image/png" href="/public/img/read-novel-icon.png">
 </head>
 <body data-page="<%= page %>">
 <%# The reading page has no app chrome — nothing above the text but the chapter
     bar it needs. The way back to the shelf is the ☰ button on that bar. %>
 <% if (page !== 'read') { %>
 <header class="topbar">
-  <a class="brand" href="/">📖 Read Novel</a>
+  <a class="brand" href="/"><img class="brand-icon" src="/public/img/read-novel-icon.png" alt="">Read Novel</a>
   <% if (typeof novel !== 'undefined' && novel) { %>
     <nav class="crumbs">
       <span class="sep">/</span>
