@@ -14,6 +14,9 @@ npm start
 
 เปิด http://localhost:3000
 
+บนเครื่องนี้ `npm start` โหลด `NOVEL_DATA_DIR` จาก `.env` (ไฟล์ local ที่ไม่ถูก commit)
+หากต้องการรันแบบแยกเดี่ยวกับ `read-novel/data` ให้ใช้ `npm run start:local`
+
 เปลี่ยนพอร์ต/ที่อยู่: `PORT=8080 npm start` (ค่าเริ่มต้นฟังทุก interface จึงเปิดจากมือถือใน LAN เดียวกันได้ที่ `http://<ip เครื่อง>:3000`)
 
 ### ใช้ข้อมูลจาก Translator โดยไม่ต้องมี data/ ซ้ำ
@@ -24,14 +27,14 @@ npm start
 PowerShell:
 
 ```powershell
-$env:NOVEL_DATA_DIR = 'C:\Users\Mac\Works\Translator\data'
+$env:NOVEL_DATA_DIR = 'E:\Works\Translator\data'
 npm start
 ```
 
 CMD:
 
 ```bat
-set "NOVEL_DATA_DIR=C:\Users\Mac\Works\Translator\data"
+set "NOVEL_DATA_DIR=E:\Works\Translator\data"
 npm start
 ```
 
