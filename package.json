@@ -5,8 +5,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "node --env-file=.env server.js",
-    "start:local": "node server.js",
+    "start": "node server.js",
     "dev": "nodemon server.js"
   },
   "dependencies": {
