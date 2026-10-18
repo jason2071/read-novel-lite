@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `npm start` — run the server (listens on `0.0.0.0:3000`; override with `PORT=...`).
 - `NOVEL_DATA_DIR=<path to a Translator data folder> npm start` — read chapters/bookmarks from an external data dir instead of local `data/`.
-- No build step, no tests, no linter configured.
+- `node --test tests/store.test.mjs` — isolated shelf/cache regression checks. No build step or linter configured.
 
 ## What this is
 
@@ -29,7 +29,7 @@ data/
 ## Architecture
 
 - `server.js` — all routes. `/` shelf, `/novel/:n` table of contents (paginated + `?q=` search), `/read/:n[/:ref]` reader, `POST /api/reader` bookmark save.
-- `lib/store.js` — filesystem layer. `DATA_DIR` resolution (env override), `safeName`/`resolveWithin` path-traversal guards (use these for any new user-supplied path), chapter listing, title extraction via 2KB head-reads, search. Two in-memory caches: `refsCache` (chapter list, invalidated by `chapters/` dir mtime) and `titleCache` — new chapters appear without restart.
+- `lib/store.js` — filesystem layer. `DATA_DIR` resolution (env override), `safeName`/`resolveWithin` path-traversal guards (use these for any new user-supplied path), chapter listing, title extraction via 2KB head-reads, search. The shelf snapshot refreshes in the background 8s after each scan; boot warms it before listening. Chapter refs and update times share one scan, cached by directory mtime with an 8s limit to detect writes inside existing folders. Only changed/deleted chapter titles are evicted. Shelf routes add bookmarks to copies of snapshot rows.
 - `lib/prefs.js` — bookmarks. In-memory state, debounced (1s) write via temp-file + rename. `saveProgress` refuses to move a bookmark **backwards** in chapter order (furthest-read wins); callers pass the ordered ref list.
 - `lib/chapter-text.js` — splits raw chapter text into title/body.
 - `views/*.ejs`, `public/css/app.css`, `public/js/reader.js` — pages, 3 reader themes, arrow-key navigation, scroll-ping bookmark saves. Visual prefs (theme, font size, spacing) live in browser `localStorage`, NOT `reader.json` — keep that split.

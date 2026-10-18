@@ -86,7 +86,7 @@ async function shelfNovels(q = '') {
     const saved = prefs.progressFor(n.name);
     n.resume = null;
     if (saved) {
-      const refs = await chapterRefs(n.name);
+      const refs = n.refs;
       const ref = saved.ref.startsWith(n.name + '/') ? saved.ref.slice(n.name.length + 1) : saved.ref;
       const idx = refs.indexOf(ref);
       if (idx >= 0) n.resume = { ref, position: idx + 1, at: saved.at };
@@ -331,6 +331,7 @@ app.use((err, req, res, _next) => {
 // -------------------------------------------------------------------- boot
 
 await prefs.init();
+await listNovels();
 app.listen(PORT, HOST, () => {
   console.log(`อ่านนิยายได้ที่  http://localhost:${PORT}`);
 });
